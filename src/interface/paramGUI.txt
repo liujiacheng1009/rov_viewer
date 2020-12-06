@@ -1,0 +1,81 @@
+Text browser :
+	STATUS :
+	arm_disarm_display
+	automatic_manual_ctrl_display
+	battery_level_display
+	light_level_display 
+    camera_tilt_display
+	
+	CONTROLLER OVERVIEW :
+	depth_measured_display
+	depth_target_display
+	depth_controller_pwm_display
+	depth_controller_KI_display
+	depth_controller_KP_display
+	depth_controller_KD_display
+
+	heading_measured_display
+	heading_target_display
+	heading_controller_pwm_display
+	heading_controller_KI_display
+	heading_controller_KP_display
+	heading_controller_KD_display
+
+	velocity_measured_display
+	velocity_target_display
+	velocity_controller_pwm_display
+	velocity_controller_KI_display
+	velocity_controller_KP_display
+	velocity_controller_KD_display
+	
+
+doubleSpinBox :
+	SET PARAMETERS :
+	doubleSpinBox_depth
+	doubleSpinBox_heading
+	doubleSpinBox_velocity
+
+spinBox :
+	SET PARAMETERS :
+	spinBox_KI_depth 
+	spinBox_KP_depth
+	spinBox_KD_depth
+
+	spinBox_KI_heading #not defined
+	spinBox_KP_heading
+	spinBox_KD_heading
+
+	spinBox_KI_velocity #not defined
+	spinBox__KP_velocity
+	spinBox_KD_velocity
+
+    RECORD DATA :
+    spinBox_depth_record_time
+    spinBox_heading_record_time
+    spinBox_velocity_record_time
+
+checkBox :
+	CONTROLLER OVERVIEW :
+	checkBox_activate_depth_controller
+	checkBox_activate_heading_controller
+	checkBox_activate_velocity_controller
+
+    STATUS :
+    checkBox_enable_automatic_control
+
+    SET PARAMETERS :
+    checkBox_forbid_publish_target
+
+pushButton :
+	SET PARAMETERS :
+	pushButton_send_parameters_depth
+	pushButton_send_parameters_heading
+	pushButton_send_parameters_velocity
+	pushButton_send_parameters_target
+	pushButton_send_pwm_max 
+
+    RECORD DATA :
+    pushButton_record_depth
+    pushButton_record_heading
+    pushButton_record_velocity
+    pushButton_record_all

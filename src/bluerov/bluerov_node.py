@@ -10,15 +10,9 @@ import sys
 import time
 
 from bridge import Bridge
-
-try:
-    from pubs import Pubs
-    from subs import Subs
-    from video import Video
-except:
-    from bluerov.pubs import Pubs
-    from bluerov.subs import Subs
-    from bluerov.video import Video
+from pubs import Pubs
+from subs import Subs
+from video import Video
 
 # convert opencv image to ros image msg
 from cv_bridge import CvBridge

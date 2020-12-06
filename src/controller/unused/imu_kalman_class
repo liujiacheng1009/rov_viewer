@@ -1,0 +1,152 @@
+#!/usr/bin/env python3
+
+from pykalman import KalmanFilter
+import numpy as np
+import matplotlib.pyplot as plt
+import time
+
+import rospy
+from sensor_msgs.msg import Imu
+
+AccX_Variance = 0.05**2
+
+class Imu_Kalman():
+
+	def __init__(self):
+
+		rospy.Subscriber('/BlueRov2/imu/data', Imu, self._callback_imu_data)
+		rospy.Subscriber('/BlueRov2/imu/imu1', Imu, self._callback_imu_1)
+		rospy.Subscriber('/BlueRov2/imu/imu2', Imu, self._callback_imu_2)
+		self.rosrate = 100
+		self.rate = rospy.Rate(self.rosrate)
+
+		self.orientation = [0,0,0,0]
+		self.acc_imu1 = [0,0,0]
+		self.acc_imu2 = [0,0,0]
+		self.acc_mean = [0,0,0]
+		self.accX_mean = 0
+
+		# time step
+		self.dt = 1/100.
+
+		# transition_matrix  
+		self.F = [[1, self.dt, 0.5*self.dt**2], 
+				  [0,  1,       self.dt],
+				  [0,  0,        1]]
+
+		# observation_matrix   
+		self.H = [0, 0, 1]
+
+		# transition_covariance 
+		self.Q =	[[0.2,    0,      0], 
+					 [  0,  0.1,      0],
+					 [  0,    0,  10e-4]]
+
+		# observation_covariance 
+		#(the value can be calculated based on your sensors datasheet).
+		self.R = AccX_Variance
+
+		# initial_state_mean
+		self.X0 =  [0,
+					0,
+					-0.05]
+
+		# initial_state_covariance
+		self.P0 =  [[  0,    0,               0], 
+			  		[  0,    0,               0],
+			  		[  0,    0,   AccX_Variance]]
+
+		self.n_dim_state = 3
+  		self.filtered_state_means = np.zeros((2, self.n_dim_state))
+  		self.filtered_state_covariances = np.zeros((2, self.n_dim_state, self.n_dim_state))
+
+  		self.kf = KalmanFilter(transition_matrices = self.F, 
+								observation_matrices = self.H, 
+								transition_covariance = self.Q, 
+								observation_covariance = self.R, 
+								initial_state_mean = self.X0, 
+								initial_state_covariance = self.P0)
+
+
+ 		self.filtered_state_means[0] = self.X0
+		self.filtered_state_covariances[0] = self.P0
+
+
+
+	def _callback_imu_data(self, msg):
+		self.orientation = [msg.orientation.w,
+							msg.orientation.x,
+							msg.orientation.y,
+							msg.orientation.z]
+
+
+	def _callback_imu_1(self, msg):
+		self.acc_imu1 = [msg.linear_acceleration.x,
+						msg.linear_acceleration.y,
+						msg.linear_acceleration.z]
+
+	def _callback_imu_2(self, msg):
+		self.acc_imu2 = [msg.linear_acceleration.x,
+						msg.linear_acceleration.y,
+						msg.linear_acceleration.z]
+
+
+
+  # compensate the accelerometer readings from gravity. 
+  # @param q the quaternion representing the orientation of a 9DOM MARG sensor array
+  # @param acc the readings coming from an accelerometer expressed in g
+  #
+  # @return a 3d vector representing dinamic acceleration expressed in g
+  	def gravity_compensate(self, q, acc):
+		g = [0.0, 0.0, 0.0]
+	
+	# get expected direction of gravity
+		g[0] = 2 * (q[1] * q[3] - q[0] * q[2])
+		g[1] = -2 * (q[0] * q[1] + q[2] * q[3])
+		g[2] = -(q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3])
+	
+	# compensate accelerometer readings with the expected direction of gravity
+
+		return [acc[0] - 9.81*g[0], acc[1] - 9.81*g[1], acc[2] - 9.81*g[2]]
+
+
+
+	def kalman_update(self):
+		self.acc_mean[0] = (self.acc_imu1[0]+self.acc_imu2[0])/2.
+		self.acc_mean[1] = (self.acc_imu1[1]+self.acc_imu2[1])/2.
+		self.acc_mean[2] = (self.acc_imu1[2]+self.acc_imu2[2])/2.
+
+		self.accX_mean = (self.acc_imu1[0]+self.acc_imu2[0])/2.
+		self.filtered_state_means[1], self.filtered_state_covariances[1] = (
+			self.kf.filter_update(
+				self.filtered_state_means[0],
+				self.filtered_state_covariances[0],
+				[self.acc_mean[0]]
+				)
+			)
+		self.filtered_state_means[0] = self.filtered_state_means[1]
+		self.filtered_state_covariances[0] = self.filtered_state_covariances[1]
+	
+
+
+if __name__ == "__main__":
+	rospy.init_node('imu_kalman', anonymous=True)
+	imu_kalman = Imu_Kalman()
+#	while not rospy.is_shutdown():
+        file_data = open("data_imu_forward3.csv", "w")
+        file_data.write("IMU1, IMU2, MEAN, ESTIMATED, EFK_speed, EFK_pos\n")
+        t0 = time.time()
+	while time.time()-t0<40:
+		imu_kalman.kalman_update()
+		file_data.write("{}, {}, {}, {}, {}, {}\n".format(imu_kalman.acc_imu1[0], imu_kalman.acc_imu2[0], imu_kalman.accX_mean, imu_kalman.filtered_state_means[1, 2],imu_kalman.filtered_state_means[1, 1], imu_kalman.filtered_state_means[1, 0]))
+        print(time.time()-t0)
+		print("AccX_Value", imu_kalman.acc_mean[0])
+		print("AccX_estimated", imu_kalman.filtered_state_means[1, 2])
+		print("VelX_estimated", imu_kalman.filtered_state_means[1, 1])
+		print("PosX_estimated", imu_kalman.filtered_state_means[1, 0]) 
+
+		#print(imu_kalman.gravity_compensate(imu_kalman.orientation, imu_kalman.acc_imu1))
+		#print(imu_kalman.acc_imu1)
+    	time.sleep(0.01)
+    	file_data.close()
+#        imu_kalman.rate.sleep()

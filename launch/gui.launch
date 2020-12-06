@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+	<!-- start control node -->
+	<node pkg="bluerov2_ros_interface" type="depth_controller.py" name="depth_controller" output="screen"/>
+	<node pkg="bluerov2_ros_interface" type="velocity_controller.py" name="velocity_controller" output="screen"/>
+	<node pkg="bluerov2_ros_interface" type="heading_controller.py" name="heading_controller" output="screen"/>
+	<node pkg="bluerov2_ros_interface" type="gamepad.py" name="gamepad" output="screen"/>
+	<node pkg="bluerov2_ros_interface" type="gui.py" name="gui" output="screen"/>
+	<node pkg="bluerov2_ros_interface" type="commander.py" name="commander" output="screen"/>
+</launch>
