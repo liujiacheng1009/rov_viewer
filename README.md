@@ -7,5 +7,5 @@ bluerov2 的ros接口和界面
 实现功能： 将bluerov2的图像和IMU数据转换为ROS topic
 
 
-pip install scipy pymavlink inputs
+pip install scipy pymavlink inputs  
 sudo apt install ros-noetic-mavros ros-noetic-mavros-msgs
