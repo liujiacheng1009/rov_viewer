@@ -1,24 +1,21 @@
-from PyQt5 import QtGui, QtCore, QtWidgets,uic
-import sys
+from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
+from PyQt5.QtWidgets import QFileDialog, QApplication
+from PyQt5 import uic
 
-class Display(QtWidgets.QMainWindow):
-
+class videoPlayer:
     def __init__(self):
-        super(Display, self).__init__() 
-        
-        uic.loadUi("bluerov.ui", self)
+        self.ui = uic.loadUi('bluerov.ui') 
+        self.player = QMediaPlayer()
+        self.player.setVideoOutput(self.ui.videoWidget)
+        self.ui.playPushButton.clicked.connect(self.openVideoFile)
 
-
-        self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.display)
-        self.timer.start(250)
-        
-    def display(self):
-        pass
+    def openVideoFile(self):
+        self.player.setMedia(QMediaContent(QFileDialog.getOpenFileUrl()[0]))
+        self.player.play()
 
 
 if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    window = Display()
-    window.show()
-    app.exec_()
+    app = QApplication([])
+    myPlayer = videoPlayer()
+    myPlayer.ui.show()
+    app.exec()

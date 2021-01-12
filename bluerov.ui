@@ -249,27 +249,27 @@
      <string>enable AUTOMATIC control</string>
     </property>
    </widget>
-   <widget class="QWidget" name="widget" native="true">
+   <widget class="QVideoWidget" name="videoWidget" native="true">
     <property name="geometry">
      <rect>
       <x>260</x>
       <y>40</y>
-      <width>561</width>
-      <height>321</height>
+      <width>480</width>
+      <height>320</height>
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="playPushButton">
     <property name="geometry">
      <rect>
-      <x>900</x>
+      <x>860</x>
       <y>340</y>
       <width>89</width>
       <height>25</height>
      </rect>
     </property>
     <property name="text">
-     <string>显示图像</string>
+     <string>Play</string>
     </property>
    </widget>
   </widget>
@@ -304,6 +304,14 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QVideoWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">PyQt5.QtMultimediaWidgets</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
