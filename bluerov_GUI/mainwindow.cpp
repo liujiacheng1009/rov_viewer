@@ -15,8 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     player->setPlaylist(playlist);
     player->setVideoOutput(ui->videoWidget);
-
-    connect(ui->videoPushButton, SIGNAL(clicked(bool)), this, SLOT(cam->pushButtonCallback()));
+    connect(ui->videoPushButton, SIGNAL(clicked(bool)), this, SLOT(cam->pushButtonCallback();));
     connect(ui->listWidget, SIGNAL(currentRowChanged(int)), ui->stackedWidget,SLOT(setCurrentIndex(int)));
 }
 

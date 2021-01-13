@@ -32,8 +32,9 @@ GstFlowReturn videoCallback(GstAppSink* appSink, gpointer data){
     gst_structure_get_int(s, "width", &width);
     GstMapInfo map;
     gst_buffer_map(buffer, &map, GST_MAP_READ);
-    QImage img = QImage(map.data, width, height,QImage::Format_RGB888);
+    Camera *cam = static_cast<Camera*>(data);
+    cam->frame = QImage(map.data, width, height,QImage::Format_RGB888);
     gst_buffer_unmap(buffer, &map);
-    gst_buffer_unref(sample);
+    gst_sample_unref(sample);
     return GST_FLOW_OK;
 }

@@ -12,6 +12,7 @@ public:
     Camera() {}
     ~Camera(){}
     void init();
+    QImage frame;
 
 private slots:
     void pushButtonCallback();
@@ -19,7 +20,6 @@ private slots:
 private:
     GstElement *videoPipe;
     GstAppSink *videoSink;
-    QImage frame;
     QString cmd;
 
 };
