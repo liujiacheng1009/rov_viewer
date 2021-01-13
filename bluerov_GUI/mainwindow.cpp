@@ -6,14 +6,17 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+
     ui->setupUi(this);
     ui->listWidget->insertItem(0,tr("参数设置"));
     ui->listWidget->insertItem(1,tr("运动控制"));
     ui->listWidget->insertItem(2,tr("显示图像"));
     ui->listWidget->insertItem(3,tr("IMU数据"));
+    //cam = &Camera();
     player->setPlaylist(playlist);
     player->setVideoOutput(ui->videoWidget);
-    connect(ui->videoPushButton, SIGNAL(clicked(bool)), this, SLOT(playVideo()));
+    //connect(ui->videoPushButton, SIGNAL(clicked(bool)), this, SLOT(cam->playVideo()));
+    connect(ui->videoPushButton, SIGNAL(clicked(bool)), this, SLOT(playVideo1()));
     connect(ui->listWidget, SIGNAL(currentRowChanged(int)), ui->stackedWidget,SLOT(setCurrentIndex(int)));
 
 }
@@ -44,4 +47,12 @@ void MainWindow::playVideo()
     player->play();
 }
 
+
+void MainWindow::playVideo1()
+{
+
+    //player->setMedia(QUrl("udp://192.168.2.1:5600"));
+    player->setMedia(QUrl("udp://127.0.0.1:5600"));
+    player->play();
+}
 

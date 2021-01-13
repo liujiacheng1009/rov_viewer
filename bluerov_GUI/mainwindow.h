@@ -6,7 +6,7 @@
 #include <QVideoWidget>
 #include <QFileDialog>
 #include <QMediaPlaylist>
-//#include "camera.h"
+#include "camera.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -24,8 +24,10 @@ private:
     Ui::MainWindow *ui;
     QMediaPlayer *player = new QMediaPlayer();
     QMediaPlaylist *playlist = new QMediaPlaylist();
+    Camera* cam;
 
 private slots:
     void playVideo();
+    void playVideo1();
 };
 #endif // MAINWINDOW_H

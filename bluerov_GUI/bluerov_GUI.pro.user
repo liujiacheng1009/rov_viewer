@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.11.0, 2021-01-13T14:46:23. -->
+<!-- Written by QtCreator 4.11.0, 2021-01-13T15:18:24. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -294,7 +294,7 @@
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
     <value type="QString" key="RunConfiguration.WorkingDirectory"></value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default"></value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/bluerov/Documents/bluerov2_ros_interface/build-bluerov_GUI-unknown-Debug</value>
    </valuemap>
    <value type="int" key="ProjectExplorer.Target.RunConfigurationCount">1</value>
   </valuemap>

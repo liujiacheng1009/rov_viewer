@@ -1,13 +1,15 @@
 #ifndef CAMERA_H
 #define CAMERA_H
-#include <
+#include <QPixmap>
+
 class Camera
 {
 public:
     Camera() {}
     ~Camera(){}
     void initCamera();
-private:
+private slots:
+    void playVideo();
 
 };
 #endif // CAMERA_H

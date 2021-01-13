@@ -356,7 +356,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QPushButton" name="videoPushButton_2">
+     <widget class="QPushButton" name="videoExitPushButton">
       <property name="geometry">
        <rect>
         <x>300</x>
