@@ -4,15 +4,16 @@
 #include<gst/gst.h>
 #include<gst/app/gstappsink.h>
 
+static GstFlowReturn videoCallback(GstAppSink* appSink, gpointer data);
+
 class Camera
 {
 public:
     Camera() {}
     ~Camera(){}
     void init();
+
 private slots:
-    void playVideo();
-    void videoCallback();
     void pushButtonCallback();
 
 private:
