@@ -24,10 +24,7 @@ private:
     Ui::MainWindow *ui;
     QMediaPlayer *player = new QMediaPlayer();
     QMediaPlaylist *playlist = new QMediaPlaylist();
-    Camera* cam;
+    Camera* cam = new Camera();
 
-private slots:
-    void playVideo();
-    void playVideo1();
 };
 #endif // MAINWINDOW_H
