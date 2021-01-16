@@ -346,16 +346,6 @@
        <string>显示</string>
       </property>
      </widget>
-     <widget class="QVideoWidget" name="videoWidget" native="true">
-      <property name="geometry">
-       <rect>
-        <x>-10</x>
-        <y>30</y>
-        <width>400</width>
-        <height>300</height>
-       </rect>
-      </property>
-     </widget>
      <widget class="QPushButton" name="videoExitPushButton">
       <property name="geometry">
        <rect>
@@ -367,6 +357,19 @@
       </property>
       <property name="text">
        <string>关闭</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="videoLabel">
+      <property name="geometry">
+       <rect>
+        <x>-10</x>
+        <y>30</y>
+        <width>400</width>
+        <height>300</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
       </property>
      </widget>
     </widget>
@@ -422,14 +425,6 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QVideoWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">qvideowidget.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

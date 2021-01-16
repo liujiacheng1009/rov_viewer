@@ -4,7 +4,6 @@
 #include<gst/gst.h>
 #include<gst/app/gstappsink.h>
 
-static GstFlowReturn videoCallback(GstAppSink* appSink, gpointer data);
 
 class Camera
 {
@@ -14,10 +13,7 @@ public:
     void init();
     QImage frame;
 
-private slots:
-    void pushButtonCallback();
-
-private:
+public:
     GstElement *videoPipe;
     GstAppSink *videoSink;
     QString cmd;
