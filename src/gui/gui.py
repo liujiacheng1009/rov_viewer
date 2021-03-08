@@ -6,6 +6,7 @@ from std_msgs.msg import UInt16
 from std_msgs.msg import Bool
 from sensor_msgs.msg import BatteryState
 from rov_viewer.msg import Attitude, Bar30, State ## 自定义msg
+import signal
 
 PATH = "/home/bluerov/Downloads/catkin_ws/src/rov_viewer/src/gui/"
 
@@ -22,14 +23,11 @@ class Display(QtWidgets.QMainWindow):
         self.timer.start(250)
 
     def init_param(self):
-        self.battery = None
-        self.pwm_depth = None
-        self.pwm_forward = None
-        self.pwm_heading = None
-        self.bar30_pressure_measured = 1015 
-        self.heading_measured = None
-        
+        self.battery = 0
         self.state = State()
+        self.imu = None
+        self.image = None
+
 
     
     def init_list_widget(self):
@@ -48,12 +46,17 @@ class Display(QtWidgets.QMainWindow):
         rospy.Subscriber('/BlueRov2/bar30', Bar30, self._bar30_callback)
 
     def display(self):
-        pass
+        print(self.battery)
+        if(self.battery):
+            self.lcdNumber_vol.display(round(self.battery, 2))
+        
+        
 
     def _state_callback(self,msg):
         self.state = msg
 
     def _battery_callback(self, msg):
+        print(msg.voltage)
         self.battery = msg.voltage
 
     def _bar30_callback(self,msg):
@@ -61,6 +64,8 @@ class Display(QtWidgets.QMainWindow):
 
 
 if __name__ == "__main__":
+    rospy.init_node('gui', anonymous=True)
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
     app = QtWidgets.QApplication(sys.argv)
     window = Display()
     window.show()
