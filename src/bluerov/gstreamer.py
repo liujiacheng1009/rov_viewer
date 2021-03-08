@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-BlueRov video capture class
+实现了gstreamer图像数据的读取
+默认端口 5600
 """
 
 import cv2
@@ -141,12 +142,14 @@ class Video():
 
 if __name__ == '__main__':
     video = Video()
-
+    cv2.namedWindow("frame",0)
+    cv2.resizeWindow("frame", 640, 480)
     while True:
         if not video.frame_available():
             continue
 
         frame = video.frame()
-        cv2.imshow('frame', frame)
+        
+        cv2.imshow("frame", frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break

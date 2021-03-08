@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-
+'''
+实现了mavlink数据的解析
+使用前需要修改对应ip和port, 默认为bluerov2 heavy的设置
+'''
 from pymavlink import mavutil
 
 class Bridge(object):
@@ -12,7 +15,7 @@ class Bridge(object):
     def __init__(self, device='udpin:192.168.2.1:14560', baudrate=115200):
         """
         Args:
-            device (str, optional): Input device
+            device (str, optional): Input device // 本机的局域网ip,端口,波特率
                 https://ardupilot.github.io/MAVProxy/html/getting_started/starting.html#master
             baudrate (int, optional): Baudrate for serial communication
         """
@@ -62,7 +65,7 @@ class Bridge(object):
         print(self.data)
 
     def set_mode(self, mode):
-        """ Set ROV mode
+        """ Set ROV mode 设置ROV模式，手动、自动、定深、定向
             http://ardupilot.org/copter/docs/flight-modes.html
 
         Args:
@@ -82,7 +85,7 @@ class Bridge(object):
     def decode_mode(self, base_mode, custom_mode):
         """ Decode mode from heartbeat
             http://mavlink.org/messages/common#heartbeat
-
+        模式编码
         Args:
             base_mode (TYPE): System mode bitfield, see MAV_MODE_FLAG ENUM in mavlink/include/mavlink_types.h
             custom_mode (TYPE): A bitfield for use for autopilot-specific flags.
@@ -122,7 +125,7 @@ class Bridge(object):
 
     def send_command_long(self, command, params=[0, 0, 0, 0, 0, 0, 0], confirmation=0):
         """ Function to abstract long commands
-
+        发送长消息
         Args:
             command (mavlink command): Command
             params (list, optional): param1, param2, ..., param7
@@ -145,7 +148,7 @@ class Bridge(object):
     def set_position_target_local_ned(self, param=[]):
         """ Create a SET_POSITION_TARGET_LOCAL_NED message
             http://mavlink.org/messages/common#SET_POSITION_TARGET_LOCAL_NED
-
+        设置目标位置
         Args:
             param (list, optional): param1, param2, ..., param11
         """
@@ -175,7 +178,7 @@ class Bridge(object):
     def set_attitude_target(self, param=[]):
         """ Create a SET_ATTITUDE_TARGET message
             http://mavlink.org/messages/common#SET_ATTITUDE_TARGET
-
+        设置目标高度
         Args:
             param (list, optional): param1, param2, ..., param7
         """
@@ -213,7 +216,7 @@ class Bridge(object):
             param[7])                               # thrust
 
     def set_servo_pwm(self, id, pwm=1500):
-        """ Set servo pwm
+        """ Set servo pwm 伺服pwm?
 
         Args:
             id (int): Servo id
@@ -226,7 +229,7 @@ class Bridge(object):
         mavutil.mavfile.set_servo(self.conn, id, pwm)
 
     def set_rc_channel_pwm(self, id, pwm=1500):
-        """ Set RC channel pwm value
+        """ Set RC channel pwm value 设置推进器的pwm值
 
         Args:
             id (TYPE): Channel id
@@ -242,7 +245,7 @@ class Bridge(object):
     
     def set_manual_control(self,joy_list=[0]*4, buttons_list=[0]*16):
         """ Set a MANUAL_CONTROL message for dealing with more control with ArduSub
-        for now it is just to deal with lights under test...
+        for now it is just to deal with lights under test... 传输手动控制信号
         """
         x,y,z,r = 0,0,0,0#32767,32767,32767,32767
         b = 0
@@ -260,7 +263,7 @@ class Bridge(object):
 
 
     def arm_throttle(self, arm_throttle):
-        """ Arm throttle
+        """ Arm throttle 解锁/锁定
 
         Args:
             arm_throttle (bool): Arm state
@@ -283,24 +286,20 @@ if __name__ == '__main__':
     #filemav = open("mavlinkdata.txt", 'w')
     while True:
         bridge.update()
-        bridge.print_data()
+        # bridge.print_data()
+        # print("\n\n\n")
         #filemav.write("{}\n".format(bridge.data))
         #bridge.set_servo_pwm(9,1800)
         #i+=1
     #filemav.close()
-        
-
-
-#        if 'SCALED_PRESSURE' not in bridge.get_data():
-#            print('NO PRESSURE DATA')
-
-
-#        else :
-#            bar30_data = bridge.get_data()['SCALED_PRESSURE']
-#            print("bar30data : ",bar30_data)
-#            time_boot_ms = bar30_data['time_boot_ms']
-#            press_abs    = bar30_data['press_abs']
-#            press_diff   = bar30_data['press_diff']
-#            temperature  = bar30_data['temperature']
-#            print("\n\n\n")
-#            print( "time :",time_boot_ms,"press_abs :", press_abs, "press_diff :",press_diff, "temperature :", temperature)
+        if 'SCALED_PRESSURE' not in bridge.get_data():
+            print('NO PRESSURE DATA')
+        else :
+            bar30_data = bridge.get_data()['SCALED_PRESSURE']
+            print("bar30data : ",bar30_data)
+            time_boot_ms = bar30_data['time_boot_ms']
+            press_abs    = bar30_data['press_abs']
+            press_diff   = bar30_data['press_diff']
+            temperature  = bar30_data['temperature']
+            print("\n\n\n")
+            print( "time :",time_boot_ms,"press_abs :", press_abs, "press_diff :",press_diff, "temperature :", temperature)

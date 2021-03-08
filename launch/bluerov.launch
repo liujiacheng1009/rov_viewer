@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+	<!-- start control node -->
+	<node pkg="rov_viewer" type="bluerov.py" name="bluerov_node" output="screen"/>
+
+</launch>

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(bluerov2_ros_interface)
+project(rov_viewer)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -51,12 +51,9 @@ add_message_files(
 	FILES
 	Bar30.msg
 	Attitude.msg
-	Set_depth.msg
-	Set_heading.msg
-	Set_velocity.msg
-	Set_target.msg
 	State.msg
 )
+
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -112,6 +109,7 @@ catkin_package(
   CATKIN_DEPENDS rospy
   CATKIN_DEPENDS message_runtime
 )
+
 ###########
 ## Build ##
 ###########
@@ -125,7 +123,7 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/bluerov2_ros_interface.cpp
+#   src/${PROJECT_NAME}/rov_viewer.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -136,7 +134,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/bluerov2_ros_interface_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/rov_viewer_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -200,7 +198,7 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_bluerov2_ros_interface.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_rov_viewer.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
