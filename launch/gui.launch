@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 	<!-- start control node -->
+    <!-- <remap from= '/BlueRov2/camera/image_raw' to= '/cam0/image_raw' /> -->
     <node pkg="rov_viewer" type="gui.py" name="gui_node" output="screen"/>
+    
 </launch>
