@@ -3,23 +3,27 @@ from PyQt5 import QtGui, QtCore, QtWidgets, uic
 
 import sys,os,time
 import rospy
-from std_msgs.msg import UInt16
-from std_msgs.msg import Bool
-from sensor_msgs.msg import BatteryState,Image, Imu
+from std_msgs.msg import Bool ,String ,UInt16
+from sensor_msgs.msg import BatteryState,Image, Imu,Joy
 from rov_viewer.msg import Attitude, Bar30, State ## 自定义msg
 import signal
 from cv_bridge import CvBridge
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from pid import PID
 
 PATH = "/home/bluerov/Downloads/catkin_ws/src/rov_viewer/src/gui/"
-i = 0 ## imu记时
+
+g = 9.81  # m.s^-2 gravitational acceleration 
+p0 = 990*100 #Pa surface pressure NEED to be cheked
+rho = 1000 # kg/m^3  water density
 
 class Display(QtWidgets.QMainWindow):
     def __init__(self):
         super(Display, self).__init__()
         uic.loadUi(PATH +"/mainwindow.ui", self)
         self.setWindowTitle("ROV VIEWER")
+        self.ROV_name = '/BlueRov2'
         ##self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.setWindowFlags(QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
         self.init_list_widget()
@@ -36,10 +40,12 @@ class Display(QtWidgets.QMainWindow):
     def init_param(self):
         self.battery = 0
         self.state = State()
+        self.bar30_data = []
         self.imu = None
         self.image = None
         self.bridge = CvBridge()
         self.play_video = False
+        self.pid = PID()
 
 
     def init_imu_canvas(self):
@@ -63,6 +69,44 @@ class Display(QtWidgets.QMainWindow):
         self.videoExitPushButton.clicked.connect(self.onVideoExitPushButtonClicked)
         self.imuPushButton.clicked.connect(self.onImuPushButtonClicked)
         self.imuExitPushButton.clicked.connect(self.onImuExitPushButtonClicked)
+        self.comboBox_lock.currentIndexChanged.connect(self.lockSelectionchange)
+        self.comboBox_mode.currentIndexChanged.connect(self.modeSelectionchange)
+        self.depth_ctr_pb.clicked.connect(self.onDepthCtrPBClicked)
+
+    def onDepthCtrPBClicked(self):
+        self.pid.kp = self.spinBox_depth_p.value()
+        self.pid.ki = self.spinBox_depth_i.value()
+        self.pid.kd = self.spinBox_depth_d.value()
+        if(not self.bar30_data):
+            return
+        curr_depth=  -(self.bar30_data[1]*100-p0)/(rho*g)
+        if not self.depth :
+            self.depth = curr_depth
+            return
+        if not self.time :
+            self.time = self.bar30_data[0]
+            return
+        delta_value = curr_value - self.depth
+        self.depth = curr_depth 
+        delta_t = self.bar30_data[0] - self.time 
+        self.time = self.bar30_data[0]
+        target_depth = self.spinBox_target_depth.value()
+        u = self.pid.control_pid(curr_depth,target_depth,delta_t)
+        mavutil.mavfile.set_servo(self.conn, 9, u)
+
+
+    def lockSelectionchange(self,idx):
+        if(idx==0): ##锁定
+            self.pub_set_arm.publish(0)
+        elif (idx==1): ##解锁
+            self.pub_set_arm.publish(1)
+    def modeSelectionchange(self,idx):
+        if(idx==0):
+            self.pub_set_mode.publish("manual")
+        elif (idx==1):
+            self.pub_set_mode.publish("auto")
+
+        
 
     def onVideoPushButtonClicked(self):
         self.play_video = True
@@ -90,7 +134,10 @@ class Display(QtWidgets.QMainWindow):
         self.listWidget.currentRowChanged.connect(self.stackedWidget.setCurrentIndex)
 
     def set_ros_pub(self):
-        pass
+        self.pub_set_arm = rospy.Publisher(self.ROV_name+'/Setting/arm', Bool, queue_size=10)
+        self.pub_set_mode = rospy.Publisher(self.ROV_name+'/Setting/mode/set', String, queue_size=10)
+        self.pub_set_manual_control = rospy.Publisher(self.ROV_name+'/Setting/manual_control', Joy, queue_size=10)
+
 
     def set_ros_sub(self):
         rospy.Subscriber('/BlueRov2/state', State, self._state_callback) 
@@ -98,6 +145,7 @@ class Display(QtWidgets.QMainWindow):
         rospy.Subscriber('/BlueRov2/bar30', Bar30, self._bar30_callback)
         rospy.Subscriber('/BlueRov2/camera/image_raw',Image , self._image_callback)
         rospy.Subscriber('/BlueRov2/imu/data',Imu , self._imu_callback)
+
 
     def display(self):
         if(self.battery):
@@ -107,7 +155,7 @@ class Display(QtWidgets.QMainWindow):
         self.acc_z.append(int(msg.linear_acceleration.z*100))
         self.acc_x.append(int(msg.linear_acceleration.x*100))
         self.acc_y.append(int(msg.linear_acceleration.y*100))
-        print(int(msg.linear_acceleration.z*100))
+
         if(len(self.acc_z)>200):
             del self.acc_z[0]
             del self.acc_y[0]
@@ -140,7 +188,8 @@ class Display(QtWidgets.QMainWindow):
         self.battery = msg.voltage
 
     def _bar30_callback(self,msg):
-        self.bar30_pressure_measured = msg.press_abs
+        self.bar30_data = [ msg.time_boot_ms,msg.press_abs,
+                            msg.press_diff,msg.temperature ]
 
 
 if __name__ == "__main__":

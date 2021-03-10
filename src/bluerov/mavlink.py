@@ -80,6 +80,7 @@ class Bridge(object):
             print('Try:', list(self.conn.mode_mapping().keys()))
             return
         mode_id = self.conn.mode_mapping()[mode]
+        print("mode",mode_id)
         self.conn.set_mode(mode_id)
 
     def decode_mode(self, base_mode, custom_mode):
@@ -280,26 +281,28 @@ class Bridge(object):
             )
 
 if __name__ == '__main__':
-    bridge = Bridge()
-    #bridge = Bridge(device='udp:localhost:14550')
+    #bridge = Bridge()
+    bridge = Bridge(device='udp:192.168.2.1:14560')
     #i=0
     #filemav = open("mavlinkdata.txt", 'w')
     while True:
         bridge.update()
-        # bridge.print_data()
-        # print("\n\n\n")
+        #bridge.print_data()
+        for key,_  in bridge.get_data().items():
+            print(key)
+        print("\n\n\n")
         #filemav.write("{}\n".format(bridge.data))
-        #bridge.set_servo_pwm(9,1800)
+        #bridge.set_servo_pwm(5,1600)
         #i+=1
     #filemav.close()
-        if 'SCALED_PRESSURE' not in bridge.get_data():
-            print('NO PRESSURE DATA')
-        else :
-            bar30_data = bridge.get_data()['SCALED_PRESSURE']
-            print("bar30data : ",bar30_data)
-            time_boot_ms = bar30_data['time_boot_ms']
-            press_abs    = bar30_data['press_abs']
-            press_diff   = bar30_data['press_diff']
-            temperature  = bar30_data['temperature']
-            print("\n\n\n")
-            print( "time :",time_boot_ms,"press_abs :", press_abs, "press_diff :",press_diff, "temperature :", temperature)
+        # if 'SCALED_PRESSURE' not in bridge.get_data():
+        #     print('NO PRESSURE DATA')
+        # else :
+        #     bar30_data = bridge.get_data()['SCALED_PRESSURE']
+        #     print("bar30data : ",bar30_data)
+        #     time_boot_ms = bar30_data['time_boot_ms']
+        #     press_abs    = bar30_data['press_abs']
+        #     press_diff   = bar30_data['press_diff']
+        #     temperature  = bar30_data['temperature']
+        #     print("\n\n\n")
+        #     print( "time :",time_boot_ms,"press_abs :", press_abs, "press_diff :",press_diff, "temperature :", temperature)

@@ -19,7 +19,7 @@ from cv_bridge import CvBridge
 # msgs type
 from geometry_msgs.msg import TwistStamped
 from nav_msgs.msg import Odometry
-from sensor_msgs.msg import BatteryState, Image, Imu
+from sensor_msgs.msg import BatteryState, Image, Imu,Joy
 from std_msgs.msg import Bool, String ,UInt16
 from rov_viewer.msg import Bar30, Attitude, State ## 自定义数据类型
 
@@ -33,7 +33,7 @@ class BlueRov(Bridge):
             baudrate (int, optional): Serial baudrate
         """
         super(BlueRov, self).__init__(device, baudrate)
-        self.ROV_name = 'BlueRov2'
+        self.ROV_name = '/BlueRov2'
         self.model_base_link = '/base_link'
 
         self.video = Video()
@@ -72,10 +72,63 @@ class BlueRov(Bridge):
             ]
         }
 
+        self.sub_topics= {
+            '/Setting/manual_control':
+            [
+                self._manual_control_callback,
+                Joy,
+                1
+            ],
+            '/Setting/mode/set':
+            [
+                self._set_mode_callback,
+                String,
+                1
+            ],
+            '/Setting/arm':
+            [
+                self._arm_callback,
+                Bool,
+                1
+            ]
+        }
+      
         self.mavlink_msg_available = {}
         for topic, pubs in self.pub_topics.items():
             self.mavlink_msg_available[topic] = 0
             pubs.append(rospy.Publisher(self.ROV_name+topic, pubs[1], queue_size=pubs[2]))
+        for topic, subs in self.sub_topics.items():
+                callback, msg_type, queue_size = subs
+                rospy.Subscriber(self.ROV_name+topic, msg_type, callback, queue_size=queue_size)
+
+
+    def _set_mode_callback(self, msg):
+        """ Set ROV mode from topic
+
+        Args:
+            msg (TYPE): Topic message
+            _ (TYPE): Description
+        """
+        self.set_mode(msg.data)
+
+    def _arm_callback(self, msg):
+        """ Set arm state from topic
+
+        Args:
+            msg (TYPE): ROS message
+            _ (TYPE): Description
+        """
+        self.arm_throttle(msg.data)
+
+    def _manual_control_callback(self, msg):
+        
+        """ Set manual control message from topic
+        
+        Args:
+            msg (TYPE): ROS message
+            _ (TYPE): description
+        """
+        self.set_manual_control([0,0,0,0], msg.buttons)
 
     def _create_header(self, msg):
         """ Create ROS message header
@@ -240,7 +293,6 @@ class BlueRov(Bridge):
         custom_mode = self.get_data()['HEARTBEAT']['custom_mode']
 
         mode, arm = self.decode_mode(base_mode, custom_mode)
-
         data = State()
         data.arm = arm
         data.rc1 = motor_throttle[0]
@@ -266,6 +318,8 @@ class BlueRov(Bridge):
             except Exception as e:
                 self.mavlink_msg_available[topic] = time.time()
                 print(e)
+
+
 
 if __name__ == '__main__':
     try:
