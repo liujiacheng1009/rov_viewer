@@ -23,6 +23,7 @@ class Display(QtWidgets.QMainWindow):
         ##self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.setWindowFlags(QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
         self.init_list_widget()
+        self.init_imu_canvas()
         self.init_menubar()
         self.init_param()
         self.add_callbacks()
@@ -39,14 +40,23 @@ class Display(QtWidgets.QMainWindow):
         self.image = None
         self.bridge = CvBridge()
         self.play_video = False
+
+
+    def init_imu_canvas(self):
         self.plot_imu = False
         self.acc_z = []
-        self.t = []
-        self.imuPlotLayout  = QtWidgets.QGridLayout(self.imuWidget)
+        self.acc_x = []
+        self.acc_y = []
+        self.t = range(0,200)
+        self.imuPlotLayout = QtWidgets.QVBoxLayout(self.imuWidget)
         self.figure = Figure()
+        self.axes1 = self.figure.add_subplot(311)
+        self.axes2 = self.figure.add_subplot(312)
+        self.axes3 = self.figure.add_subplot(313)
         self.canvas = FigureCanvas(self.figure)
         self.imuPlotLayout.addWidget(self.canvas)
-
+        self.imuWidget.setFocus()
+        
     
     def add_callbacks(self):
         self.videoPushButton.clicked.connect(self.onVideoPushButtonClicked)
@@ -94,20 +104,26 @@ class Display(QtWidgets.QMainWindow):
             self.lcdNumber_vol.display(round(self.battery, 2))
 
     def _imu_callback(self,msg):
-        global i
         self.acc_z.append(int(msg.linear_acceleration.z*100))
-        self.t.append(i)
+        self.acc_x.append(int(msg.linear_acceleration.x*100))
+        self.acc_y.append(int(msg.linear_acceleration.y*100))
         print(int(msg.linear_acceleration.z*100))
-        print(len(self.t),len(self.acc_z))
-        
-        if(len(self.acc_z)>=200):
+        if(len(self.acc_z)>200):
             del self.acc_z[0]
-            del self.t[0]
+            del self.acc_y[0]
+            del self.acc_x[0]
+        else:
+            self.plot_imu = False
         if(self.plot_imu):
-            self.figure.add_subplot(111).plot(self.t,self.acc_z)
-            self.canvas.show()
+            self.axes1.cla()
+            self.axes2.cla()
+            self.axes3.cla()
+            self.axes1.plot(self.t, self.acc_z, 'r')
+            self.axes2.plot(self.t, self.acc_y, 'g')
+            self.axes3.plot(self.t, self.acc_x, 'y')
+            self.canvas.draw()
             time.sleep(0.05)
-        i+= 1
+
         
     def _image_callback(self,msg):
         cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
