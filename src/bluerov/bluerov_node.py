@@ -10,10 +10,9 @@ import rospy
 import sys
 import time
 
-from mavlink import Bridge
-from gstreamer import Video
+from mav_bridge import MAVBridge
+from gst_reader import GSTReader
 
-# convert opencv image to ros image msg
 from cv_bridge import CvBridge
 
 # msgs type
@@ -24,9 +23,9 @@ from std_msgs.msg import Bool, String ,UInt16
 from rov_viewer.msg import Bar30, Attitude, State ## 自定义数据类型
 
 
-class BlueRov(Bridge):
-    def __init__(self, device='udp:192.168.2.1:14550', baudrate=115200):
-        """ BlueRov ROS Bridge
+class BlueRov(MAVBridge):
+    def __init__(self, device='udp:192.168.2.1:14560', baudrate=115200):
+        """ 继承自MAVBridge
 
         Args:
             device (str, optional): mavproxy device description
@@ -36,7 +35,7 @@ class BlueRov(Bridge):
         self.ROV_name = '/BlueRov2'
         self.model_base_link = '/base_link'
 
-        self.video = Video()
+        self.video = GSTReader()
         self.video_bridge = CvBridge()
 
         self.pub_topics = {
@@ -69,6 +68,18 @@ class BlueRov(Bridge):
                 self._create_bar30_msg,
                 Bar30,
                 1
+            ],
+            '/odometry':
+            [
+                self._create_odometry_msg,
+                Odometry,
+                1
+            ],
+            '/imu/attitude':
+            [
+                self._create_imu_euler_msg,
+                Attitude,
+                1
             ]
         }
 
@@ -90,17 +101,125 @@ class BlueRov(Bridge):
                 self._arm_callback,
                 Bool,
                 1
+            ],
+            '/servo{}/set_pwm':
+            [
+                self._set_servo_callback,
+                UInt16,
+                1,
+                [1, 2, 3, 4, 5, 6, 7, 8]
+            ],
+            '/setpoint_velocity/cmd_vel':
+            [
+                self._setpoint_velocity_cmd_vel_callback,
+                TwistStamped,
+                1
+            ],
+            '/rc_channel{}/set_pwm':
+            [
+                self._set_rc_channel_callback,
+                UInt16,
+                1,
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
             ]
         }
       
         self.mavlink_msg_available = {}
         for topic, pubs in self.pub_topics.items():
-            self.mavlink_msg_available[topic] = 0
+            self.mavlink_msg_available[topic] = 0 ## 控制发送频率
             pubs.append(rospy.Publisher(self.ROV_name+topic, pubs[1], queue_size=pubs[2]))
         for topic, subs in self.sub_topics.items():
+            if(len(subs)==3):
                 callback, msg_type, queue_size = subs
                 rospy.Subscriber(self.ROV_name+topic, msg_type, callback, queue_size=queue_size)
+            else:
+                callback, msg_type, queue_size,arg = subs
+                for name in arg:
+                    topicx = topic.format(name)
+                    rospy.Subscriber(self.ROV_name+topicx, msg_type, callback, callback_args=topicx, queue_size=queue_size)
 
+
+    def _setpoint_velocity_cmd_vel_callback(self, msg, _):
+        """ Set angular and linear velocity from topic
+
+        Args:
+            msg (TYPE): ROS message
+            _ (TYPE): Description
+        """
+        #http://mavlink.org/messages/common#SET_POSITION_TARGET_GLOBAL_INT
+        params = [
+            None,
+            None,
+            None,
+            msg.twist.linear.x,
+            msg.twist.linear.y,
+            msg.twist.linear.z,
+            None,
+            None,
+            None,
+            None,
+            None,
+            ]
+        self.set_position_target_local_ned(params)
+
+        #http://mavlink.org/messages/common#SET_ATTITUDE_TARGET
+        params = [
+            None,
+            None,
+            None,
+            None,
+            msg.twist.angular.x,
+            msg.twist.angular.y,
+            msg.twist.angular.z,
+            None,
+            ]
+        self.set_attitude_target(params)
+        
+    def _set_servo_callback(self, msg, topic):
+        """ Set servo from topic
+
+        Args:
+            msg (TYPE): ROS message
+            topic (TYPE): Topic name
+
+        Returns:
+            None: Description
+        """
+        paths = topic.split('/')
+        servo_id = None
+        for path in paths:
+            if 'servo' in path:
+                servo_id = int(re.search('[0-9]', path).group(0)) + 1
+                # Found valid id !
+                break
+        else:
+            # No valid id
+            return
+        print(servo_id)
+        self.set_servo_pwm(servo_id, msg.data)
+
+    def _set_rc_channel_callback(self, msg, topic):
+        """ Set RC channel from topic
+
+        Args:
+            msg (TYPE): ROS message
+            topic (TYPE): Topic name
+
+        Returns:
+            TYPE: Description
+        """
+        paths = topic.split('/')
+        channel_id = None
+        for path in paths:
+            if 'rc_channel' in path:
+                channel_id = int(re.search('[0-9]', path).group(0))  - 1
+                # Found valid id !
+                break
+        else:
+            # No valid id
+            return
+
+        self.set_rc_channel_pwm(channel_id, msg.data)
 
     def _set_mode_callback(self, msg):
         """ Set ROV mode from topic
@@ -151,6 +270,81 @@ class BlueRov(Bridge):
         msg.press_abs    = bar30_data['press_abs']
         msg.press_diff   = bar30_data['press_diff']
         msg.temperature  = bar30_data['temperature']
+
+        self.pub_topics[topic][3].publish(msg)
+
+    def _create_odometry_msg(self,topic):
+        """ Create odometry message from ROV information
+
+        Raises:
+            Exception: No data to create the message
+        """
+
+        # Check if data is available
+        if 'LOCAL_POSITION_NED' not in self.get_data():
+            raise Exception('no LOCAL_POSITION_NED data')
+
+        if 'ATTITUDE' not in self.get_data():
+            raise Exception('no ATTITUDE data')
+
+        #TODO: Create class to deal with BlueRov state
+        msg = Odometry()
+
+        self._create_header(msg)
+
+        #http://mavlink.org/messages/common#LOCAL_POSITION_NED
+        local_position_data = self.get_data()['LOCAL_POSITION_NED']
+        xyz_data = [local_position_data[i]  for i in ['x', 'y', 'z']]
+        vxyz_data = [local_position_data[i]  for i in ['vx', 'vy', 'z']]
+        msg.pose.pose.position.x = xyz_data[0]
+        msg.pose.pose.position.y = xyz_data[1]
+        msg.pose.pose.position.z = xyz_data[2]
+        msg.twist.twist.linear.x = vxyz_data[0]/100
+        msg.twist.twist.linear.y = vxyz_data[1]/100
+        msg.twist.twist.linear.z = vxyz_data[2]/100
+
+        #http://mavlink.org/messages/common#ATTITUDE
+        attitude_data = self.get_data()['ATTITUDE']
+        orientation = [attitude_data[i] for i in ['roll', 'pitch', 'yaw']]
+        orientation_speed = [attitude_data[i] for i in ['rollspeed', 'pitchspeed', 'yawspeed']]
+
+        #https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Euler_Angles_to_Quaternion_Conversion
+        cy = math.cos(orientation[2] * 0.5)
+        sy = math.sin(orientation[2] * 0.5)
+        cr = math.cos(orientation[0] * 0.5)
+        sr = math.sin(orientation[0] * 0.5)
+        cp = math.cos(orientation[1] * 0.5)
+        sp = math.sin(orientation[1] * 0.5)
+
+        msg.pose.pose.orientation.w = cy * cr * cp + sy * sr * sp
+        msg.pose.pose.orientation.x = cy * sr * cp - sy * cr * sp
+        msg.pose.pose.orientation.y = cy * cr * sp + sy * sr * cp
+        msg.pose.pose.orientation.z = sy * cr * cp - cy * sr * sp
+        msg.twist.twist.angular.x = orientation_speed[0]
+        msg.twist.twist.angular.y = orientation_speed[1]
+        msg.twist.twist.angular.z = orientation_speed[2]
+
+        self.pub_topics[topic][3].publish(msg)
+
+    def _create_imu_euler_msg(self,topic):
+        if 'ATTITUDE' not in self.get_data():
+            raise Exception('no ATTITUDE data')
+        else :
+            pass
+        #http://mavlink.org/messages/common#ATTITUDE
+        attitude_data = self.get_data()['ATTITUDE']
+        orientation = [attitude_data[i] for i in ['roll', 'pitch', 'yaw']]
+        orientation_speed = [attitude_data[i] for i in ['rollspeed', 'pitchspeed', 'yawspeed']]
+        
+        msg = Attitude()
+        self._create_header(msg)
+        msg.time_boot_ms = attitude_data['time_boot_ms']
+        msg.roll = orientation[0]
+        msg.pitch = orientation[1]
+        msg.yaw = orientation[2]
+        msg.rollspeed = orientation_speed[0]
+        msg.pitchspeed = orientation_speed[1]
+        msg.yawspeed = orientation_speed[2]
 
         self.pub_topics[topic][3].publish(msg)
 
@@ -323,7 +517,7 @@ class BlueRov(Bridge):
 
 if __name__ == '__main__':
     try:
-        rospy.init_node('user_node', log_level=rospy.DEBUG)
+        rospy.init_node('bluerov_node', log_level=rospy.DEBUG)
     except rospy.ROSInterruptException as error:
         print('pubs error with ROS: ', error)
         exit(1)

@@ -1,12 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import rospy
 from std_msgs.msg import String
 from std_msgs.msg import UInt16
 from std_msgs.msg import Bool
-from bluerov_ros_playground.msg import Bar30
-from bluerov_ros_playground.msg import Set_depth
-from bluerov_ros_playground.msg import Set_target
+from rov_viewer.msg import Bar30
+from rov_viewer.msg import Set_depth
+from rov_viewer.msg import Set_target
 #axis z goes up
 
 g = 9.81  # m.s^-2 gravitational acceleration 
@@ -48,8 +48,8 @@ class Depth_Control():
     def __init__(self, depth_desired=0, pwm_max=1500, pwm_neutral=1500, rosrate=4):
         self.pub_pwm = rospy.Publisher('/Command/depth', UInt16, queue_size=10)
         rospy.Subscriber('/BlueRov2/bar30', Bar30, self._callback_bar30)
-        rospy.Subscriber('/Settings/set_depth', Set_depth, self._callback_set_depth)
-        rospy.Subscriber('/Settings/set_target', Set_target, self._callback_set_target)
+        rospy.Subscriber('/BlueRov2/Settings/set_depth', Set_depth, self._callback_set_depth)
+        rospy.Subscriber('/BlueRov2/Settings/set_target', Set_target, self._callback_set_target)
 
         self.rate = rospy.Rate(rosrate)
         self.depth_desired = depth_desired

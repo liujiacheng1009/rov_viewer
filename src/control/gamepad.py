@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from __future__ import print_function
 import rospy
@@ -35,7 +35,7 @@ class Gamepad():
     input: dict, link between button named from gamepad and method to call.
     """
     def __init__(self, pwm_max=1900, pwm_neutral=1500, gain_pwm_cam = 400, rosrate=4):
-        self.pub = rospy.Publisher('/BlueRov2/Setting/manual_control', Joy, queue_size=10)
+        self.pub = rospy.Publisher('/Command/joy', Joy, queue_size=10)
         self.sub = rospy.Subscriber('/BlueRov2/arm', Bool, self._arm_callback) 
         self.rate = rospy.Rate(rosrate)
         self.model_base_link = '/base_link'
@@ -210,7 +210,7 @@ class Gamepad():
         """Set to zeros when joystisk come back to the center"""
         if pwm >= 1495 and pwm <= 1505: #to ensure that when stick are in the center neutral pwm i send
             pwm = self.pwm_neutral
-        return int(pwm)
+	return int(pwm)
 
     def publish(self):
         try:

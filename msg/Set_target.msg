@@ -1,0 +1,3 @@
+float64 depth_desired
+float64 heading_desired
+float64 velocity_desired

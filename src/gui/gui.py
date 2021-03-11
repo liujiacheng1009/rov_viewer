@@ -5,12 +5,12 @@ import sys,os,time
 import rospy
 from std_msgs.msg import Bool ,String ,UInt16
 from sensor_msgs.msg import BatteryState,Image, Imu,Joy
-from rov_viewer.msg import Attitude, Bar30, State ## 自定义msg
+from rov_viewer.msg import Attitude, Bar30, State,Set_target,Set_heading,Set_depth,Set_velocity ## 自定义msg
 import signal
 from cv_bridge import CvBridge
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from pid import PID
+# from pid import PID
 
 PATH = "/home/bluerov/Downloads/catkin_ws/src/rov_viewer/src/gui/"
 
@@ -45,7 +45,12 @@ class Display(QtWidgets.QMainWindow):
         self.image = None
         self.bridge = CvBridge()
         self.play_video = False
-        self.pid = PID()
+       # self.pid = PID()
+        self.target_ctrl_msgToSend = Set_target()
+        self.heading_ctrl_msgToSend = Set_heading() 
+        self.depth_ctrl_msgToSend = Set_depth()
+        self.velocity_ctrl_msgToSend = Set_velocity()
+        self._enable_publish_target = False
 
 
     def init_imu_canvas(self):
@@ -71,28 +76,69 @@ class Display(QtWidgets.QMainWindow):
         self.imuExitPushButton.clicked.connect(self.onImuExitPushButtonClicked)
         self.comboBox_lock.currentIndexChanged.connect(self.lockSelectionchange)
         self.comboBox_mode.currentIndexChanged.connect(self.modeSelectionchange)
-        self.depth_ctr_pb.clicked.connect(self.onDepthCtrPBClicked)
+        #self.depth_ctr_pb.clicked.connect(self.onDepthCtrPBClicked)
+        self.pushButton_send_parameters_target.clicked.connect(self._target_param_clicked)
+        self.pushButton_send_parameters_heading.clicked.connect(self._heading_param_clicked)
+        self.pushButton_send_parameters_velocity.clicked.connect(self._velocity_param_clicked)
+        self.pushButton_send_parameters_depth.clicked.connect(self._depth_param_clicked)
 
-    def onDepthCtrPBClicked(self):
-        self.pid.kp = self.spinBox_depth_p.value()
-        self.pid.ki = self.spinBox_depth_i.value()
-        self.pid.kd = self.spinBox_depth_d.value()
-        if(not self.bar30_data):
-            return
-        curr_depth=  -(self.bar30_data[1]*100-p0)/(rho*g)
-        if not self.depth :
-            self.depth = curr_depth
-            return
-        if not self.time :
-            self.time = self.bar30_data[0]
-            return
-        delta_value = curr_value - self.depth
-        self.depth = curr_depth 
-        delta_t = self.bar30_data[0] - self.time 
-        self.time = self.bar30_data[0]
-        target_depth = self.spinBox_target_depth.value()
-        u = self.pid.control_pid(curr_depth,target_depth,delta_t)
-        mavutil.mavfile.set_servo(self.conn, 9, u)
+    def _depth_param_clicked(self):
+        """Raised when button SEND is clicked from depth PID parameters
+        Define depth PID coefficients for message Set_depth
+        """
+        self.depth_ctrl_msgToSend.KI = self.spinBox_KI_depth.value()
+        self.depth_ctrl_msgToSend.KP = self.spinBox_KP_depth.value()
+        self.depth_ctrl_msgToSend.KD = self.spinBox_KD_depth.value()
+
+    def _heading_param_clicked(self):
+        """Raised when button SEND is clicked from heading PID parameters
+        Define heading PID coefficients for message Set_heading
+        """
+        #self.heading_ctrl_msgToSend.KI = self.spinBox_KI_heading.value()
+        self.heading_ctrl_msgToSend.KP = self.spinBox_KP_heading.value()
+        self.heading_ctrl_msgToSend.KD = self.spinBox_KD_heading.value()
+
+    def _velocity_param_clicked(self):
+        """Raised when button SEND is clicked from velocity PID parameters
+        Define heading PID coefficients for message Set_velocity
+        """
+        #self.velocity_ctrl_msgToSend.KI = self.spinBox_KI_velocity.value()
+        self.velocity_ctrl_msgToSend.KP = self.spinBox_KP_velocity.value()
+        self.velocity_ctrl_msgToSend.KD = self.spinBox_KD_velocity.value()
+
+    def _pwm_max_clicked(self):
+        """Raised when button SEND is clicked from PWM MAX
+        Define the max pwm for all controller for their saturation method
+        """
+        self.depth_ctrl_msgToSend.pwm_max = self.spinBox_pwm_max.value() 
+        self.heading_ctrl_msgToSend.pwm_max = self.spinBox_pwm_max.value()
+        self.velocity_ctrl_msgToSend.pwm_max = self.spinBox_pwm_max.value()
+
+    def _target_param_clicked(self):
+        self.target_ctrl_msgToSend.depth_desired = - self.doubleSpinBox_depth.value()
+        self.target_ctrl_msgToSend.heading_desired = self.doubleSpinBox_heading.value()
+        self.target_ctrl_msgToSend.velocity_desired = self.doubleSpinBox_velocity.value()
+
+    # def onDepthCtrPBClicked(self):
+    #     self.pid.kp = self.spinBox_depth_p.value()
+    #     self.pid.ki = self.spinBox_depth_i.value()
+    #     self.pid.kd = self.spinBox_depth_d.value()
+    #     if(not self.bar30_data):
+    #         return
+    #     curr_depth=  -(self.bar30_data[1]*100-p0)/(rho*g)
+    #     if not self.depth :
+    #         self.depth = curr_depth
+    #         return
+    #     if not self.time :
+    #         self.time = self.bar30_data[0]
+    #         return
+    #     delta_value = curr_value - self.depth
+    #     self.depth = curr_depth 
+    #     delta_t = self.bar30_data[0] - self.time 
+    #     self.time = self.bar30_data[0]
+    #     target_depth = self.spinBox_target_depth.value()
+    #     u = self.pid.control_pid(curr_depth,target_depth,delta_t)
+    #     mavutil.mavfile.set_servo(self.conn, 9, u)
 
 
     def lockSelectionchange(self,idx):
@@ -137,6 +183,10 @@ class Display(QtWidgets.QMainWindow):
         self.pub_set_arm = rospy.Publisher(self.ROV_name+'/Setting/arm', Bool, queue_size=10)
         self.pub_set_mode = rospy.Publisher(self.ROV_name+'/Setting/mode/set', String, queue_size=10)
         self.pub_set_manual_control = rospy.Publisher(self.ROV_name+'/Setting/manual_control', Joy, queue_size=10)
+        self.pub_set_heading = rospy.Publisher(self.ROV_name+'/Settings/set_heading', Set_heading, queue_size=10)
+        self.pub_set_depth = rospy.Publisher(self.ROV_name+'/Settings/set_depth', Set_depth, queue_size=10)
+        self.pub_set_velocity = rospy.Publisher(self.ROV_name+'/Settings/set_velocity', Set_velocity, queue_size=10)
+        self.pub_set_target = rospy.Publisher(self.ROV_name+'/Settings/set_target', Set_target, queue_size=10)
 
 
     def set_ros_sub(self):
@@ -145,11 +195,19 @@ class Display(QtWidgets.QMainWindow):
         rospy.Subscriber('/BlueRov2/bar30', Bar30, self._bar30_callback)
         rospy.Subscriber('/BlueRov2/camera/image_raw',Image , self._image_callback)
         rospy.Subscriber('/BlueRov2/imu/data',Imu , self._imu_callback)
+        
 
 
     def display(self):
         if(self.battery):
             self.lcdNumber_vol.display(round(self.battery, 2))
+
+        self.pub_set_velocity.publish(self.velocity_ctrl_msgToSend)
+        self.pub_set_heading.publish(self.heading_ctrl_msgToSend)
+        self.pub_set_depth.publish(self.depth_ctrl_msgToSend)
+        if self._enable_publish_target:
+            self.pub_set_target.publish(self.target_ctrl_msgToSend)
+
 
     def _imu_callback(self,msg):
         self.acc_z.append(int(msg.linear_acceleration.z*100))

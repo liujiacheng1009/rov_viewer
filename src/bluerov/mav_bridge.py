@@ -5,41 +5,44 @@
 '''
 from pymavlink import mavutil
 
-class Bridge(object):
-    """ MAVLink bridge
+class MAVBridge(object):
+    '''
+    输入：传输协议udp,监听ip,端口(本机,需修改以太网设置)
+    输出：所有通过mavlink传输的数据
+    '''
 
-    Attributes:
-        conn (TYPE): MAVLink connection
-        data (dict): Deal with all data
-    """
-    def __init__(self, device='udpin:192.168.2.1:14560', baudrate=115200):
-        """
-        Args:
-            device (str, optional): Input device // 本机的局域网ip,端口,波特率
-                https://ardupilot.github.io/MAVProxy/html/getting_started/starting.html#master
-            baudrate (int, optional): Baudrate for serial communication
-        """
+    def __init__(self,device='udpin:192.168.2.1:14560',baudrate=115200):
+        '''
+        建立连接
+        '''
         self.conn = mavutil.mavlink_connection(device, baud=baudrate)
-
-        self.conn.wait_heartbeat()
+        self.conn.wait_heartbeat() 
         self.conn.mav.request_data_stream_send(self.conn.target_system, self.conn.target_component,
                             mavutil.mavlink.MAV_DATA_STREAM_ALL,4, 1)
-            
         self.data = {}
 
     def get_data(self):
-        """ Return data
+        """ 获取dict形式的mavlink数据
 
         Returns:
             TYPE: Dict
         """
         return self.data
 
-    def get_all_msgs(self):
-        """ Return all mavlink messages
+    def update(self):
+        """ 
+        更新数据,保存于字典data
+        """
+        # Get all messages
+        msgs = self.get_all_msgs()
+        # Update dict
+        for msg in msgs:
+            self.data[msg.get_type()] = msg.to_dict()
 
-        Returns:
-            TYPE: dict
+    
+    def get_all_msgs(self):
+        """ 
+        将接收到的mavlink数据存入数组msgs
         """
         msgs = []
         while True:
@@ -50,29 +53,16 @@ class Bridge(object):
                 break
         return msgs
 
-    def update(self):
-        """ Update data dict
-        """
-        # Get all messages
-        msgs = self.get_all_msgs()
-        # Update dict
-        for msg in msgs:
-            self.data[msg.get_type()] = msg.to_dict()
-
     def print_data(self):
-        """ Debug function, print data dict
+        """ 
+        打印数据，用于测试
         """
         print(self.data)
 
     def set_mode(self, mode):
-        """ Set ROV mode 设置ROV模式，手动、自动、定深、定向
-            http://ardupilot.org/copter/docs/flight-modes.html
-
-        Args:
-            mode (str): MMAVLink mode
-
-        Returns:
-            TYPE: Description
+        """ 
+        设置飞行模式
+        参见：http://ardupilot.org/copter/docs/flight-modes.html
         """
         mode = mode.upper()
         if mode not in self.conn.mode_mapping():
@@ -80,19 +70,18 @@ class Bridge(object):
             print('Try:', list(self.conn.mode_mapping().keys()))
             return
         mode_id = self.conn.mode_mapping()[mode]
-        print("mode",mode_id)
         self.conn.set_mode(mode_id)
 
+
     def decode_mode(self, base_mode, custom_mode):
-        """ Decode mode from heartbeat
-            http://mavlink.org/messages/common#heartbeat
-        模式编码
-        Args:
+        """ 从心跳包中解析飞行模式和锁定状态
+
+        输入:
             base_mode (TYPE): System mode bitfield, see MAV_MODE_FLAG ENUM in mavlink/include/mavlink_types.h
             custom_mode (TYPE): A bitfield for use for autopilot-specific flags.
 
-        Returns:
-            [str, bool]: Type mode string, arm state
+        输出:
+            [str, bool]: 飞行模式, 锁定状态
         """
         flight_mode = ""
 
@@ -118,16 +107,16 @@ class Bridge(object):
         return flight_mode, arm
 
     def set_guided_mode(self):
-        """ Set guided mode
+        """ 设置引导模式
         """
         #https://github.com/ArduPilot/pymavlink/pull/128
         params = [mavutil.mavlink.MAV_MODE_GUIDED, 0, 0, 0, 0, 0, 0]
         self.send_command_long(mavutil.mavlink.MAV_CMD_DO_SET_MODE, params)
-
+    
     def send_command_long(self, command, params=[0, 0, 0, 0, 0, 0, 0], confirmation=0):
-        """ Function to abstract long commands
-        发送长消息
-        Args:
+        """ 发送长指令
+
+        参数:
             command (mavlink command): Command
             params (list, optional): param1, param2, ..., param7
             confirmation (int, optional): Confirmation value
@@ -147,10 +136,8 @@ class Bridge(object):
         )
 
     def set_position_target_local_ned(self, param=[]):
-        """ Create a SET_POSITION_TARGET_LOCAL_NED message
-            http://mavlink.org/messages/common#SET_POSITION_TARGET_LOCAL_NED
-        设置目标位置
-        Args:
+        """ 发送一个SET_POSITION_TARGET_LOCAL_NED 信号，设置目标位置?
+        参数:
             param (list, optional): param1, param2, ..., param11
         """
         if len(param) != 11:
@@ -164,7 +151,6 @@ class Bridge(object):
             else:
                 param[i] = 0.0
 
-        #http://mavlink.org/messages/common#SET_POSITION_TARGET_GLOBAL_INT
         self.conn.mav.set_position_target_local_ned_send(
             0,                                              # system time in milliseconds
             self.conn.target_system,                        # target system
@@ -177,10 +163,8 @@ class Bridge(object):
             param[9], param[10])                            # yaw, yaw rate
 
     def set_attitude_target(self, param=[]):
-        """ Create a SET_ATTITUDE_TARGET message
-            http://mavlink.org/messages/common#SET_ATTITUDE_TARGET
-        设置目标高度
-        Args:
+        """ 产生一个 SET_ATTITUDE_TARGET 信号，设置目标姿态
+        参数:
             param (list, optional): param1, param2, ..., param7
         """
         if len(param) != 8:
@@ -217,36 +201,33 @@ class Bridge(object):
             param[7])                               # thrust
 
     def set_servo_pwm(self, id, pwm=1500):
-        """ Set servo pwm 伺服pwm?
+        """ 设置伺服电机的pwm
 
-        Args:
-            id (int): Servo id
-            pwm (int, optional): pwm value 1100-2000
+        参数:
+            id (int): 伺服电机id
+            pwm (int, optional): pwm 范围是 1100-2000
         """
-
-        #http://mavlink.org/messages/common#MAV_CMD_DO_SET_SERVO
-        # servo id
-        # pwm 1000-2000
         mavutil.mavfile.set_servo(self.conn, id, pwm)
 
+
     def set_rc_channel_pwm(self, id, pwm=1500):
-        """ Set RC channel pwm value 设置推进器的pwm值
+        """ 设置RC Channel的pwm,可以控制ROV的上下、前后等运动
 
         Args:
-            id (TYPE): Channel id
-            pwm (int, optional): Channel pwm value 1100-2000
+            id (TYPE): 通道 id
+            pwm (int, optional):  pwm 范围是 1100-2000
         """
         rc_channel_values = [65535 for _ in range(8)] #8 for mavlink1
         rc_channel_values[id] = pwm
-        #http://mavlink.org/messages/common#RC_CHANNELS_OVERRIDE
         self.conn.mav.rc_channels_override_send(
             self.conn.target_system,                # target_system
             self.conn.target_component,             # target_component
             *rc_channel_values)                     # RC channel list, in microseconds.
     
     def set_manual_control(self,joy_list=[0]*4, buttons_list=[0]*16):
-        """ Set a MANUAL_CONTROL message for dealing with more control with ArduSub
-        for now it is just to deal with lights under test... 传输手动控制信号
+        """ 发送手动控制信号
+        Set a MANUAL_CONTROL message for dealing with more control with ArduSub
+        for now it is just to deal with lights under test...
         """
         x,y,z,r = 0,0,0,0#32767,32767,32767,32767
         b = 0
@@ -262,9 +243,8 @@ class Bridge(object):
                 r,
                 b)
 
-
     def arm_throttle(self, arm_throttle):
-        """ Arm throttle 解锁/锁定
+        """ 修改锁定状态
 
         Args:
             arm_throttle (bool): Arm state
@@ -279,30 +259,3 @@ class Bridge(object):
                 mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM,
                 [0, 0, 0, 0, 0, 0, 0]
             )
-
-if __name__ == '__main__':
-    #bridge = Bridge()
-    bridge = Bridge(device='udp:192.168.2.1:14560')
-    #i=0
-    #filemav = open("mavlinkdata.txt", 'w')
-    while True:
-        bridge.update()
-        #bridge.print_data()
-        for key,_  in bridge.get_data().items():
-            print(key)
-        print("\n\n\n")
-        #filemav.write("{}\n".format(bridge.data))
-        #bridge.set_servo_pwm(5,1600)
-        #i+=1
-    #filemav.close()
-        # if 'SCALED_PRESSURE' not in bridge.get_data():
-        #     print('NO PRESSURE DATA')
-        # else :
-        #     bar30_data = bridge.get_data()['SCALED_PRESSURE']
-        #     print("bar30data : ",bar30_data)
-        #     time_boot_ms = bar30_data['time_boot_ms']
-        #     press_abs    = bar30_data['press_abs']
-        #     press_diff   = bar30_data['press_diff']
-        #     temperature  = bar30_data['temperature']
-        #     print("\n\n\n")
-        #     print( "time :",time_boot_ms,"press_abs :", press_abs, "press_diff :",press_diff, "temperature :", temperature)
