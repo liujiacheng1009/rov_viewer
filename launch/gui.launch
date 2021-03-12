@@ -2,6 +2,6 @@
 <launch>
 	<!-- start control node -->
     <!-- <remap from='/BlueRov2/imu/data' to= '/imu0'  /> -->
-    <node pkg="rov_viewer" type="gui.py" name="gui_node" output="screen"/>
+    <node pkg="rov_viewer" type="gui2.py" name="gui_node" output="screen"/>
     
 </launch>

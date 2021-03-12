@@ -3,20 +3,27 @@
         <file>img/bluerov2.png</file>
         <file>img/scut.png</file>
         <file>img/scut2.png</file>
+        <file>img/joystick-defaults.png</file>
+        <file>img/underwater.jpg</file>
     </qresource>
     <qresource prefix="/icon">
-        <file>icon/add-file-icon-18.jpg</file>
-        <file>icon/ai.png</file>
-        <file>icon/arrow.png</file>
-        <file>icon/camera.png</file>
-        <file>icon/ClipartKey_196823.png</file>
+        <file>icon/camera.ico</file>
+        <file>icon/conn.ico</file>
+        <file>icon/depth.ico</file>
+        <file>icon/gamepad.ico</file>
         <file>icon/home.png</file>
-        <file>icon/open-archive-svgrepo-com.svg</file>
-        <file>icon/pngwing.com.png</file>
+        <file>icon/imu.ico</file>
+        <file>icon/lock.ico</file>
+        <file>icon/velo.ico</file>
+        <file>icon/yaw.ico</file>
+        <file>icon/depth.png</file>
+        <file>icon/lock.png</file>
         <file>icon/puzzle.png</file>
         <file>icon/puzzle2.png</file>
         <file>icon/system-monitor.png</file>
-        <file>icon/tongue.png</file>
-        <file>icon/yin-yang.png</file>
+        <file>icon/velocity.png</file>
+        <file>icon/yaw.png</file>
+        <file>icon/camera.png</file>
+        <file>icon/gamepad1.ico</file>
     </qresource>
 </RCC>

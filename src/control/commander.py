@@ -64,16 +64,16 @@ class Commander():
         #self.pub_rc10 = rospy.Publisher('/BlueRov2/rc_channel10/set_pwm', UInt16, queue_size=10) #LIGHTS 2
         #self.pub_manual_control = rospy.Publisher('/BlueRov2/manual_control', Joy, queue_size=10)
 
-        rospy.Subscriber('/Command/depth', UInt16, self._callback_depth)
-        rospy.Subscriber('/Command/heading', UInt16, self._callback_heading)
-        rospy.Subscriber('/Command/velocity', UInt16, self._callback_velocity)
-        rospy.Subscriber('/Command/joy', Joy, self._callback_joy)
+        rospy.Subscriber('/BlueRov2/Command/depth', UInt16, self._callback_depth)
+        rospy.Subscriber('/BlueRov2/Command/heading', UInt16, self._callback_heading)
+        rospy.Subscriber('/BlueRov2/Command/velocity', UInt16, self._callback_velocity)
+        rospy.Subscriber('/BlueRov2/Command/joy', Joy, self._callback_joy)
 
         rospy.Subscriber('/BlueRov2/Settings/set_depth', Set_depth, self._settings_depth_ctrl_callback)
         rospy.Subscriber('/BlueRov2/Settings/set_heading', Set_heading, self._settings_heading_ctrl_callback)
         rospy.Subscriber('/BlueRov2/Settings/set_velocity', Set_velocity, self._settings_velocity_ctrl_callback)
 
-        self.pub_arm = rospy.Publisher('/BlueRov2/arm', Bool, queue_size=10)
+        self.pub_arm = rospy.Publisher('/BlueRov2/Setting/arm', Bool, queue_size=10)
         self.rate = rospy.Rate(rosrate)
         
         self.pwm_velocity = pwm_velocity

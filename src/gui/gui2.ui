@@ -56,7 +56,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <property name="iconSize">
      <size>
@@ -75,7 +75,7 @@
      <attribute name="title">
       <string/>
      </attribute>
-     <widget class="QPushButton" name="btn_img_stitching">
+     <widget class="QPushButton" name="btn_manual">
       <property name="geometry">
        <rect>
         <x>50</x>
@@ -100,7 +100,7 @@
        <bool>false</bool>
       </property>
       <property name="statusTip">
-       <string>口腔扫描图像拼接</string>
+       <string>手动控制</string>
       </property>
       <property name="styleSheet">
        <string notr="true">QPushButton:hover{
@@ -124,9 +124,8 @@ QPushButton{
        <string/>
       </property>
       <property name="icon">
-       <iconset>
-        <normaloff>:/icons/icon/puzzle.png</normaloff>
-        <activeon>:/icons/icon/puzzle2.png</activeon>:/icons/icon/puzzle.png</iconset>
+       <iconset resource="gui.qrc">
+        <normaloff>:/icon/icon/gamepad1.ico</normaloff>:/icon/icon/gamepad1.ico</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -153,7 +152,7 @@ QPushButton{
        <bool>false</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_tongue">
+     <widget class="QPushButton" name="btn_depth">
       <property name="geometry">
        <rect>
         <x>170</x>
@@ -178,7 +177,7 @@ QPushButton{
        <bool>false</bool>
       </property>
       <property name="statusTip">
-       <string>舌像分析</string>
+       <string>定深控制</string>
       </property>
       <property name="styleSheet">
        <string notr="true">QPushButton:hover{
@@ -202,8 +201,8 @@ QPushButton{
        <string/>
       </property>
       <property name="icon">
-       <iconset>
-        <normaloff>:/icons/icon/tongue.png</normaloff>:/icons/icon/tongue.png</iconset>
+       <iconset resource="gui.qrc">
+        <normaloff>:/icon/icon/depth.png</normaloff>:/icon/icon/depth.png</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -230,7 +229,7 @@ QPushButton{
        <bool>false</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_ml">
+     <widget class="QPushButton" name="btn_atti">
       <property name="geometry">
        <rect>
         <x>290</x>
@@ -255,7 +254,7 @@ QPushButton{
        <bool>false</bool>
       </property>
       <property name="statusTip">
-       <string>鼻咽癌诊断</string>
+       <string>定姿控制</string>
       </property>
       <property name="styleSheet">
        <string notr="true">QPushButton:hover{
@@ -279,8 +278,8 @@ QPushButton{
        <string/>
       </property>
       <property name="icon">
-       <iconset>
-        <normaloff>:/icons/icon/pngwing.com.png</normaloff>:/icons/icon/pngwing.com.png</iconset>
+       <iconset resource="gui.qrc">
+        <normaloff>:/icon/icon/yaw.png</normaloff>:/icon/icon/yaw.png</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -364,7 +363,7 @@ QPushButton{
        <number>1</number>
       </property>
      </widget>
-     <widget class="QPushButton" name="new_2">
+     <widget class="QPushButton" name="btn_conn">
       <property name="geometry">
        <rect>
         <x>50</x>
@@ -372,6 +371,12 @@ QPushButton{
         <width>101</width>
         <height>101</height>
        </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
       <property name="font">
        <font>
@@ -389,10 +394,10 @@ QPushButton{
        <bool>false</bool>
       </property>
       <property name="toolTip">
-       <string>新建患者信息</string>
+       <string>连接</string>
       </property>
       <property name="statusTip">
-       <string>新建患者信息</string>
+       <string>连接</string>
       </property>
       <property name="whatsThis">
        <string/>
@@ -417,6 +422,10 @@ QPushButton{
       </property>
       <property name="text">
        <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="gui.qrc">
+        <normaloff>:/icon/icon/conn.ico</normaloff>:/icon/icon/conn.ico</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -461,7 +470,7 @@ QPushButton{
        <string>连接</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="new_3">
+     <widget class="QPushButton" name="btn_arm">
       <property name="geometry">
        <rect>
         <x>170</x>
@@ -486,10 +495,10 @@ QPushButton{
        <bool>false</bool>
       </property>
       <property name="toolTip">
-       <string>打开患者信息</string>
+       <string>解锁</string>
       </property>
       <property name="statusTip">
-       <string>打开患者信息</string>
+       <string>解锁</string>
       </property>
       <property name="styleSheet">
        <string notr="true">QPushButton:hover{
@@ -513,8 +522,8 @@ QPushButton{
        <string/>
       </property>
       <property name="icon">
-       <iconset>
-        <normaloff>:/icons/icon/open-archive-svgrepo-com.svg</normaloff>:/icons/icon/open-archive-svgrepo-com.svg</iconset>
+       <iconset resource="gui.qrc">
+        <normaloff>:/icon/icon/lock.ico</normaloff>:/icon/icon/lock.ico</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -544,9 +553,9 @@ QPushButton{
      <widget class="QLabel" name="label_30">
       <property name="geometry">
        <rect>
-        <x>200</x>
+        <x>190</x>
         <y>160</y>
-        <width>41</width>
+        <width>71</width>
         <height>31</height>
        </rect>
       </property>
@@ -556,10 +565,10 @@ QPushButton{
        </font>
       </property>
       <property name="text">
-       <string>解锁</string>
+       <string>解锁/锁定</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="new_4">
+     <widget class="QPushButton" name="btn_imu">
       <property name="geometry">
        <rect>
         <x>290</x>
@@ -584,10 +593,10 @@ QPushButton{
        <bool>false</bool>
       </property>
       <property name="toolTip">
-       <string>打开患者信息</string>
+       <string>查看IMU信息</string>
       </property>
       <property name="statusTip">
-       <string>打开患者信息</string>
+       <string>查看IMU信息</string>
       </property>
       <property name="styleSheet">
        <string notr="true">QPushButton:hover{
@@ -611,8 +620,8 @@ QPushButton{
        <string/>
       </property>
       <property name="icon">
-       <iconset>
-        <normaloff>:/icons/icon/open-archive-svgrepo-com.svg</normaloff>:/icons/icon/open-archive-svgrepo-com.svg</iconset>
+       <iconset resource="gui.qrc">
+        <normaloff>:/icon/icon/imu.ico</normaloff>:/icon/icon/imu.ico</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -639,7 +648,7 @@ QPushButton{
        <bool>false</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_ml_2">
+     <widget class="QPushButton" name="btn_velo">
       <property name="geometry">
        <rect>
         <x>410</x>
@@ -664,7 +673,7 @@ QPushButton{
        <bool>false</bool>
       </property>
       <property name="statusTip">
-       <string>鼻咽癌诊断</string>
+       <string>定速控制</string>
       </property>
       <property name="styleSheet">
        <string notr="true">QPushButton:hover{
@@ -688,8 +697,8 @@ QPushButton{
        <string/>
       </property>
       <property name="icon">
-       <iconset>
-        <normaloff>:/icons/icon/pngwing.com.png</normaloff>:/icons/icon/pngwing.com.png</iconset>
+       <iconset resource="gui.qrc">
+        <normaloff>:/icon/icon/velo.ico</normaloff>:/icon/icon/velo.ico</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -716,7 +725,7 @@ QPushButton{
        <bool>false</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="new_5">
+     <widget class="QPushButton" name="btn_cam">
       <property name="geometry">
        <rect>
         <x>410</x>
@@ -741,10 +750,10 @@ QPushButton{
        <bool>false</bool>
       </property>
       <property name="toolTip">
-       <string>打开患者信息</string>
+       <string>查看相机信息</string>
       </property>
       <property name="statusTip">
-       <string>打开患者信息</string>
+       <string>查看相机信息</string>
       </property>
       <property name="styleSheet">
        <string notr="true">QPushButton:hover{
@@ -768,8 +777,8 @@ QPushButton{
        <string/>
       </property>
       <property name="icon">
-       <iconset>
-        <normaloff>:/icons/icon/open-archive-svgrepo-com.svg</normaloff>:/icons/icon/open-archive-svgrepo-com.svg</iconset>
+       <iconset resource="gui.qrc">
+        <normaloff>:/icon/icon/camera.png</normaloff>:/icon/icon/camera.png</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -927,11 +936,11 @@ QPushButton:hover{
        <bool>false</bool>
       </property>
      </widget>
-     <widget class="QListWidget" name="listWidget">
+     <widget class="QListWidget" name="listWidget_imu">
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>100</y>
+        <y>40</y>
         <width>681</width>
         <height>391</height>
        </rect>
@@ -1061,6 +1070,25 @@ QPushButton:hover{
      <attribute name="title">
       <string>相机</string>
      </attribute>
+     <widget class="QLabel" name="label_img_show">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>40</y>
+        <width>681</width>
+        <height>391</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap resource="gui.qrc">:/img/img/underwater.jpg</pixmap>
+      </property>
+      <property name="scaledContents">
+       <bool>true</bool>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab">
      <attribute name="icon">
@@ -1070,21 +1098,640 @@ QPushButton:hover{
      <attribute name="title">
       <string>手动控制</string>
      </attribute>
+     <widget class="QLabel" name="label_img_show_2">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>40</y>
+        <width>681</width>
+        <height>391</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap resource="gui.qrc">:/img/img/joystick-defaults.png</pixmap>
+      </property>
+      <property name="scaledContents">
+       <bool>true</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
       <string>定深</string>
      </attribute>
+     <widget class="QLabel" name="label_20">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>100</y>
+        <width>91</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>目标深度：</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="doubleSpinBox_depth">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>100</y>
+        <width>87</width>
+        <height>26</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="spinBox_KP_depth">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>230</y>
+        <width>87</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>1000</number>
+      </property>
+      <property name="value">
+       <number>600</number>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_send_parameters_depth">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>300</y>
+        <width>86</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>SEND</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="spinBox_KI_depth">
+      <property name="geometry">
+       <rect>
+        <x>142</x>
+        <y>230</y>
+        <width>87</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>1000</number>
+      </property>
+      <property name="value">
+       <number>100</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_14">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>188</y>
+        <width>87</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>PID 参数</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_24">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>230</y>
+        <width>86</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>KP :</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_17">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>230</y>
+        <width>86</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>KD :</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_16">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>230</y>
+        <width>86</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>KI :</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="spinBox_KD_depth">
+      <property name="geometry">
+       <rect>
+        <x>500</x>
+        <y>230</y>
+        <width>87</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>1000</number>
+      </property>
+      <property name="value">
+       <number>50</number>
+      </property>
+      <property name="displayIntegerBase">
+       <number>10</number>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_send_parameters_depth_2">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>100</y>
+        <width>86</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>SEND</string>
+      </property>
+     </widget>
+     <widget class="Line" name="line">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>270</y>
+        <width>481</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="lineWidth">
+       <number>2</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="Line" name="line_2">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>210</y>
+        <width>481</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="lineWidth">
+       <number>2</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_3">
      <attribute name="title">
       <string>定姿</string>
      </attribute>
+     <widget class="QLabel" name="label_25">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>230</y>
+        <width>86</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>KP :</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="spinBox_KP_depth_2">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>230</y>
+        <width>87</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>1000</number>
+      </property>
+      <property name="value">
+       <number>600</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_18">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>230</y>
+        <width>86</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>KI :</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="Line" name="line_3">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>270</y>
+        <width>481</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="lineWidth">
+       <number>2</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_21">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>100</y>
+        <width>91</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>目标仰角：</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="Line" name="line_4">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>210</y>
+        <width>481</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="lineWidth">
+       <number>2</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_19">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>230</y>
+        <width>86</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>KD :</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="spinBox_KI_depth_2">
+      <property name="geometry">
+       <rect>
+        <x>142</x>
+        <y>230</y>
+        <width>87</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>1000</number>
+      </property>
+      <property name="value">
+       <number>100</number>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_send_parameters_depth_3">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>300</y>
+        <width>86</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>SEND</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_send_parameters_depth_4">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>100</y>
+        <width>86</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>SEND</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="spinBox_KD_depth_2">
+      <property name="geometry">
+       <rect>
+        <x>500</x>
+        <y>230</y>
+        <width>87</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>1000</number>
+      </property>
+      <property name="value">
+       <number>50</number>
+      </property>
+      <property name="displayIntegerBase">
+       <number>10</number>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="doubleSpinBox_depth_2">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>100</y>
+        <width>87</width>
+        <height>26</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_23">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>188</y>
+        <width>87</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>PID 参数</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_4">
      <attribute name="title">
       <string>定速</string>
      </attribute>
+     <widget class="QLabel" name="label_26">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>230</y>
+        <width>86</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>KP :</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="spinBox_KP_depth_3">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>230</y>
+        <width>87</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>1000</number>
+      </property>
+      <property name="value">
+       <number>600</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_27">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>230</y>
+        <width>86</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>KI :</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="Line" name="line_5">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>270</y>
+        <width>481</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="lineWidth">
+       <number>2</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_28">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>100</y>
+        <width>91</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>目标速度：</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="Line" name="line_6">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>210</y>
+        <width>481</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="lineWidth">
+       <number>2</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_29">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>230</y>
+        <width>86</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>KD :</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="spinBox_KI_depth_3">
+      <property name="geometry">
+       <rect>
+        <x>142</x>
+        <y>230</y>
+        <width>87</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>1000</number>
+      </property>
+      <property name="value">
+       <number>100</number>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_send_parameters_depth_5">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>300</y>
+        <width>86</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>SEND</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_send_parameters_depth_6">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>100</y>
+        <width>86</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>SEND</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="spinBox_KD_depth_3">
+      <property name="geometry">
+       <rect>
+        <x>500</x>
+        <y>230</y>
+        <width>87</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>1000</number>
+      </property>
+      <property name="value">
+       <number>50</number>
+      </property>
+      <property name="displayIntegerBase">
+       <number>10</number>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="doubleSpinBox_depth_3">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>100</y>
+        <width>87</width>
+        <height>26</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_34">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>188</y>
+        <width>87</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>PID 参数</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -1356,11 +2003,27 @@ QPushButton:hover{
       </attribute>
      </widget>
      <widget class="QWidget" name="page">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>161</width>
+        <height>85</height>
+       </rect>
+      </property>
       <attribute name="label">
        <string>相机</string>
       </attribute>
      </widget>
      <widget class="QWidget" name="page_4">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>161</width>
+        <height>85</height>
+       </rect>
+      </property>
       <attribute name="label">
        <string>其他</string>
       </attribute>
