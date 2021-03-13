@@ -59,10 +59,4 @@ image_raw 需要重新转回image类型
 接下来处理camera的显示：
 1、显示的图片有模糊的现象,gst读取后opencv显示没有问题，转成ros msg出了问题
 
-下面处理手动控制：
-需要订阅/BlueRov2/Setting/arm topic, 然后，将gamepad输入转化为 /BlueRov2/Command/joy,
-由commander处理
 
-存在的问题：还是这个锁定不够灵敏，多次发送才能成功
-
-下面处理定深、定向、定速.

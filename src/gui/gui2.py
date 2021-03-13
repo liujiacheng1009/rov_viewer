@@ -5,7 +5,7 @@ import sys,os,time
 import rospy
 from std_msgs.msg import Bool ,String ,UInt16
 from sensor_msgs.msg import BatteryState,Image, Imu,Joy
-from rov_viewer.msg import Attitude, Bar30, State,Set_target,Set_heading,Set_depth,Set_velocity ## 自定义msg
+from rov_viewer.msg import Attitude, Bar30, State,SetHeading,SetDepth,SetVelocity ## 自定义msg
 import signal
 from cv_bridge import CvBridge
 from matplotlib.figure import Figure
@@ -45,15 +45,97 @@ class Display(QtWidgets.QMainWindow):
         self.ui.btn_velo.clicked.connect(self.go_to_velo_crl)
         self.ui.btn_atti.clicked.connect(self.go_to_atti_crl)
         self.ui.btn_arm.clicked.connect(self.send_arm)
-        
+        ## 定向、定速、定深控制按钮
+        self.ui.pb_depth_stop.clicked.connect(self.exit_depth_ctr)
+        self.ui.pb_depth_send.clicked.connect(self.set_depth_ctr)
+        self.ui.pb_heading_stop.clicked.connect(self.exit_heading_ctr)
+        self.ui.pb_heading_send.clicked.connect(self.set_heading_ctr)
+        self.ui.pb_velocity_stop.clicked.connect(self.exit_velocity_ctr)
+        self.ui.pb_velocity_send.clicked.connect(self.set_velocity_ctr)
+        ## 定深页面
+        self.ui.dsb_depth_target.valueChanged.connect(self.depthTargetValuechange)
+        self.ui.sb_depth_max_pwm.valueChanged.connect(self.depthMaxPWMValuechange)
+        self.ui.sb_depth_ki.valueChanged.connect(self.depthKIValuechange)
+        self.ui.sb_depth_kp.valueChanged.connect(self.depthKPValuechange)
+        self.ui.sb_depth_kd.valueChanged.connect(self.depthKDValuechange)
+        ## 定向页面, I参数无效
+        self.ui.dsb_heading_target.valueChanged.connect(self.headingTargetValuechange)
+        self.ui.sb_heading_max_pwm.valueChanged.connect(self.headingMaxPWMValuechange)
+        self.ui.sb_heading_kp.valueChanged.connect(self.headingKPValuechange)
+        self.ui.sb_heading_kd.valueChanged.connect(self.headingKDValuechange)
 
+        ## 定速页面, I参数无效
+        self.ui.dsb_velocity_target.valueChanged.connect(self.velocityTargetValuechange)
+        self.ui.sb_velocity_max_pwm.valueChanged.connect(self.velocityMaxPWMValuechange)
+        self.ui.sb_velocity_kp.valueChanged.connect(self.velocityKPValuechange)
+        self.ui.sb_velocity_kd.valueChanged.connect(self.velocityKDValuechange)
 
         self.timer = QtCore.QTimer() ## 定时刷新
         self.timer.timeout.connect(self.display)
         self.timer.start(250)
 
+    def velocityTargetValuechange(self):
+        self.set_velocity.velocity_desired = self.ui.dsb_velocity_target.value()
+
+    def velocityMaxPWMValuechange(self):
+        self.set_velocity.pwm_max = self.ui.sb_velocity_max_pwm.value()
+    
+    def velocityKPValuechange(self):
+        self.set_velocity.KP = self.ui.sb_velocity_kp.value()
+
+    def velocityKDValuechange(self):
+        self.set_velocity.KD = self.ui.sb_velocity_kd.value()
+
+    def headingTargetValuechange(self):
+        self.set_heading.heading_desired = self.ui.dsb_heading_target.value()
+
+    def headingMaxPWMValuechange(self):
+        self.set_heading.pwm_max = self.ui.sb_heading_max_pwm.value()
+
+    def headingKPValuechange(self):
+        self.set_heading.KP = self.ui.sb_heading_kp.value()
+
+    def headingKDValuechange(self):
+        self.set_heading.KD = self.ui.sb_heading_kd.value()
+
+    def exit_heading_ctr(self):
+        self.set_heading.enable_heading_ctrl = False
+
+    def set_heading_ctr(self):
+        self.set_heading.enable_heading_ctrl = True
+
+    def exit_velocity_ctr(self):
+        self.set_velocity.enable_velocity_ctrl = False
+
+    def set_velocity_ctr(self):
+        self.set_velocity.enable_velocity_ctrl = True
+
+    def depthTargetValuechange(self):
+        self.set_depth.depth_desired = self.ui.dsb_depth_target.value()
+
+    def depthMaxPWMValuechange(self):
+        self.set_depth.pwm_max = self.ui.sb_depth_max_pwm.value()
+
+    def depthKIValuechange(self):
+        self.set_depth.KI = self.ui.sb_depth_ki.value()
+    
+    def depthKPValuechange(self):
+        self.set_depth.KP = self.ui.sb_depth_kp.value()
+
+    def depthKDValuechange(self):
+        self.set_depth.KD = self.ui.sb_depth_kd.value()
+
+    def exit_depth_ctr(self):
+        self.set_depth.enable_depth_ctrl = False
+    
+    def set_depth_ctr(self):
+        self.set_depth.enable_depth_ctrl = True
+
     def set_ros_pubs(self):
         self.pub_set_arm = rospy.Publisher(self.ROV_name+'/Setting/arm', Bool, queue_size=10)
+        self.pub_set_depth = rospy.Publisher(self.ROV_name+'/Setting/set_depth', SetDepth, queue_size=10)## PID定深
+        self.pub_set_heading = rospy.Publisher(self.ROV_name+'/Setting/set_heading', SetHeading, queue_size=10)## PID定向
+        self.pub_set_velocity = rospy.Publisher(self.ROV_name+'/Setting/set_velocity', SetVelocity, queue_size=10)## PID定速
 
     def send_arm(self):
         if(self.arm != 0):
@@ -109,6 +191,26 @@ class Display(QtWidgets.QMainWindow):
         self.image = None
         self.light = -1
         self.cam_angle = -1
+
+        self.set_depth = SetDepth()
+        self.set_depth.enable_depth_ctrl = False
+        self.set_depth.pwm_max = 1700
+        self.set_depth.KI = 100
+        self.set_depth.KP = 600
+        self.set_depth.KD = 50
+
+        self.set_heading = SetHeading()
+        self.set_heading.enable_heading_ctrl = False
+        self.set_heading.pwm_max = 1700
+        self.set_heading.KP = 35
+        self.set_heading.KD = 25
+
+        self.set_velocity = SetVelocity()
+        self.set_velocity.enable_velocity_ctrl = False
+        self.set_velocity.pwm_max = 1700
+        self.set_velocity.KP = 100
+        self.set_velocity.KD = 25
+
 
     def init_page(self):
         self.textEdit  = QtWidgets.QTextEdit()
@@ -204,6 +306,19 @@ class Display(QtWidgets.QMainWindow):
         self.update_page4()
         self.update_imu_plot()
         self.update_image_show()
+        self.update_depth_ctr()
+        self.update_heading_ctr()
+        self.update_velocity_ctr()
+
+    def update_heading_ctr(self):
+        print(self.set_heading)
+        self.pub_set_heading.publish(self.set_heading)
+
+    def update_velocity_ctr(self):
+        self.pub_set_velocity.publish(self.set_velocity)
+
+    def update_depth_ctr(self):
+        self.pub_set_depth.publish(self.set_depth)
 
     def update_image_show(self):
         if(self.image is None):

@@ -4,9 +4,9 @@ import rospy
 from std_msgs.msg import UInt16
 from std_msgs.msg import Bool
 from sensor_msgs.msg import Joy
-from rov_viewer.msg import Set_velocity 
-from rov_viewer.msg import Set_heading 
-from rov_viewer.msg import Set_depth
+from rov_viewer.msg import SetVelocity 
+from rov_viewer.msg import SetHeading 
+from rov_viewer.msg import SetDepth
 from time import sleep
 
 class Commander():
@@ -69,11 +69,11 @@ class Commander():
         rospy.Subscriber('/BlueRov2/Command/velocity', UInt16, self._callback_velocity)
         rospy.Subscriber('/BlueRov2/Command/joy', Joy, self._callback_joy)
 
-        rospy.Subscriber('/BlueRov2/Settings/set_depth', Set_depth, self._settings_depth_ctrl_callback)
-        rospy.Subscriber('/BlueRov2/Settings/set_heading', Set_heading, self._settings_heading_ctrl_callback)
-        rospy.Subscriber('/BlueRov2/Settings/set_velocity', Set_velocity, self._settings_velocity_ctrl_callback)
+        rospy.Subscriber('/BlueRov2/Setting/set_depth', SetDepth, self._settings_depth_ctrl_callback)
+        rospy.Subscriber('/BlueRov2/Setting/set_heading', SetHeading, self._settings_heading_ctrl_callback)
+        rospy.Subscriber('/BlueRov2/Setting/set_velocity', SetVelocity, self._settings_velocity_ctrl_callback)
 
-        self.pub_arm = rospy.Publisher('/BlueRov2/Setting/arm', Bool, queue_size=10)
+        #self.pub_arm = rospy.Publisher('/BlueRov2/Setting/arm', Bool, queue_size=10)
         self.rate = rospy.Rate(rosrate)
         
         self.pwm_velocity = pwm_velocity
@@ -86,7 +86,7 @@ class Commander():
         self.enable_heading_ctrl = False
         self.enable_velocity_ctrl = False
 
-        self.override_controller = 1 # 0:automatic control, 1:gamepad control
+        self.override_controller = 0 # 0:automatic control, 1:gamepad control
         self.gamepad_axes = [self.pwm_neutral, self.pwm_neutral, self.pwm_neutral, self.pwm_neutral] # THROTTLE,YAW,FORWARD, LATERAL
         self.gamepad_buttons = [0,0,1500,0,0, 1100] # ARM, OVERRIDE_CONTROLLER, PWM_CAM, LIGHT_DEC, LIGHT_INC, PWM_LIGHT
 
@@ -98,6 +98,7 @@ class Commander():
         UInt16
         """
         self.pwm_depth = msg.data
+        print("pwm_depth: ", self.pwm_depth)
 
     def _callback_heading(self,msg):
         """Read from '/Command/heading'
@@ -174,7 +175,7 @@ class Commander():
  
     def publish_controller_command(self):
         """In automatic mode : arm the BlueRov2 and publish only pwm from enable controller"""   
-        self.pub_arm.publish(self.armed)
+        # self.pub_arm.publish(self.armed)
         if self.enable_depth_ctrl:
             print('DEPTH CONTROLLER ENABLE')
             self.pub_rc3.publish(self.pwm_depth)
@@ -193,7 +194,7 @@ class Commander():
 
         lights cannot be controlled yet
         """
-        self.pub_arm.publish(self.gamepad_buttons[0])
+        #self.pub_arm.publish(self.gamepad_buttons[0])
         self.pub_rc8.publish(self.gamepad_buttons[2]) #CAMERA
         #self.pub_rc9.publish(self.gamepad_buttons[5])
         #self.pub_rc10.publish(self.gamepad_buttons[5])

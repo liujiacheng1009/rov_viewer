@@ -5,8 +5,8 @@ from std_msgs.msg import String
 from std_msgs.msg import UInt16
 from std_msgs.msg import Bool
 from rov_viewer.msg import Bar30
-from rov_viewer.msg import Set_depth
-from rov_viewer.msg import Set_target
+from rov_viewer.msg import SetDepth
+
 #axis z goes up
 
 g = 9.81  # m.s^-2 gravitational acceleration 
@@ -46,10 +46,10 @@ class Depth_Control():
     I_depth: integral of depth
     """
     def __init__(self, depth_desired=0, pwm_max=1500, pwm_neutral=1500, rosrate=4):
-        self.pub_pwm = rospy.Publisher('/Command/depth', UInt16, queue_size=10)
+        self.pub_pwm = rospy.Publisher('/BlueRov2/Command/depth', UInt16, queue_size=10)
         rospy.Subscriber('/BlueRov2/bar30', Bar30, self._callback_bar30)
-        rospy.Subscriber('/BlueRov2/Settings/set_depth', Set_depth, self._callback_set_depth)
-        rospy.Subscriber('/BlueRov2/Settings/set_target', Set_target, self._callback_set_target)
+        rospy.Subscriber('/BlueRov2/Setting/set_depth', SetDepth, self._callback_set_depth)
+        #rospy.Subscriber('/BlueRov2/Settings/set_target', Set_target, self._callback_set_target)
 
         self.rate = rospy.Rate(rosrate)
         self.depth_desired = depth_desired
@@ -81,7 +81,7 @@ class Depth_Control():
                             msg.temperature ]
         	                
     def _callback_set_depth(self, msg):
-        """Read data from '/Settings/set_depth'
+        """Read data from '/Setting/set_depth'
 
         ROS message:
         ------------
@@ -98,17 +98,18 @@ class Depth_Control():
         self.KI = msg.KI 
         self.KP = msg.KP 
         self.KD = msg.KD 
-
-    def _callback_set_target(self, msg):
-        """Read data from '/Settings/set_target'
-
-        ROS message:
-        -------------
-        float64 depth_desired
-        float64 heading_desired
-        float64 velocity_desired
-        """
         self.depth_desired = msg.depth_desired
+
+    # def _callback_set_target(self, msg):
+    #     """Read data from '/Settings/set_target'
+
+    #     ROS message:
+    #     -------------
+    #     float64 depth_desired
+    #     float64 heading_desired
+    #     float64 velocity_desired
+    #     """
+    #     self.depth_desired = msg.depth_desired
 
     def control_pid(self, p):
         """PID controller

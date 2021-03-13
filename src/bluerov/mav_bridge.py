@@ -61,7 +61,7 @@ class MAVBridge(object):
 
     def set_mode(self, mode):
         """ 
-        设置飞行模式
+        设置飞行模式，这里暂时用不上,默认是manual
         参见：http://ardupilot.org/copter/docs/flight-modes.html
         """
         mode = mode.upper()

@@ -52,10 +52,9 @@ add_message_files(
 	Bar30.msg
 	Attitude.msg
   State.msg
-  Set_depth.msg 
-  Set_heading.msg 
-  Set_target.msg 
-  Set_velocity.msg 
+  SetDepth.msg 
+  SetHeading.msg 
+  SetVelocity.msg 
 )
 
 

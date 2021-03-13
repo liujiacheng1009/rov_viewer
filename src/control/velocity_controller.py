@@ -8,8 +8,8 @@ from std_msgs.msg import String
 from std_msgs.msg import UInt16
 from std_msgs.msg import Bool
 from sensor_msgs.msg import Imu
-from bluerov_ros_playground.msg import Set_velocity
-from bluerov_ros_playground.msg import Set_target
+from rov_viewer.msg import SetVelocity
+
 
 class Velocity_Control():
     """ Class Velocity_Control: reach velocity desired with PD control
@@ -36,8 +36,8 @@ class Velocity_Control():
     """
     def __init__(self, velocity_desired=1, pwm_max=1500, pwm_neutral=1500, KP=100, KD=25, rosrate=10):
     
-        self.pub_pwm = rospy.Publisher('/Command/velocity', UInt16, queue_size=10)
-        rospy.Subscriber('/imu/data_raw', Imu, self._callback_imu_data)
+        self.pub_pwm = rospy.Publisher('/BlueRov2/Command/velocity', UInt16, queue_size=10)
+        rospy.Subscriber('/BlueROV2/imu/data_raw', Imu, self._callback_imu_data)
         self.rate = rospy.Rate(rosrate)
 
         self.velocity_desired = velocity_desired
@@ -53,8 +53,7 @@ class Velocity_Control():
         plt.ion()
         self.fig = plt.figure(1)
         self.ax = self.fig.add_subplot(111)
-        rospy.Subscriber('/Settings/set_velocity', Set_velocity, self._callback_set_vel)
-        rospy.Subscriber('/Settings/set_target', Set_target, self._callback_set_target)
+        rospy.Subscriber('/BlueRov2/Settings/set_velocity', SetVelocity, self._callback_set_vel)
         
     def _callback_imu_data(self, msg):
         """Read data from '/imu/data_raw'
@@ -85,17 +84,18 @@ class Velocity_Control():
             self.pwm_max = msg.pwm_max
         self.KP = msg.KP 
         self.KD = msg.KD 
-
-    def _callback_set_target(self, msg):
-        """Read data from '/Settings/set_target'
-
-        ROS message:
-        -------------
-        float64 depth_desired
-        float64 heading_desired
-        float64 velocity_desired
-        """
         self.velocity_desired = msg.velocity_desired
+
+    # def _callback_set_target(self, msg):
+    #     """Read data from '/Settings/set_target'
+
+    #     ROS message:
+    #     -------------
+    #     float64 depth_desired
+    #     float64 heading_desired
+    #     float64 velocity_desired
+    #     """
+    #     self.velocity_desired = msg.velocity_desired
 
     def velocity(self):
         """
@@ -104,9 +104,9 @@ class Velocity_Control():
         """
         self.speedX = self.speedX + scipy.integrate.trapz(self.accX, dx=0.02)
         print("SPEED : {}".format(self.speedX))
-        self.ax.plot(rospy.get_time()-self.t0, self.accX[1], "+b")
-        self.ax.plot(rospy.get_time()-self.t0, self.speedX, "+g")
-        plt.pause(0.01)
+        # self.ax.plot(rospy.get_time()-self.t0, self.accX[1], "+b")
+        # self.ax.plot(rospy.get_time()-self.t0, self.speedX, "+g")
+        # plt.pause(0.01)
 
     def control(self):
         """PD controller, not working yet

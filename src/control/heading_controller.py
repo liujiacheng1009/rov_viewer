@@ -6,9 +6,8 @@ from std_msgs.msg import String
 from std_msgs.msg import UInt16
 from std_msgs.msg import Bool
 from sensor_msgs.msg import Imu
-from bluerov_ros_playground.msg import Attitude
-from bluerov_ros_playground.msg import Set_heading
-from bluerov_ros_playground.msg import Set_target
+from rov_viewer.msg import Attitude
+from rov_viewer.msg import SetHeading
 
 PI = np.pi
 
@@ -39,11 +38,11 @@ class Heading_Controller():
     """
 
     def __init__(self, heading_desired=0, KP=35, KD=25, pwm_max=1500, pwm_neutral=1500,rosrate=4):
-        self.pub_pwm = rospy.Publisher('/Command/heading', UInt16, queue_size=10)
+        self.pub_pwm = rospy.Publisher('/BlueRov2/Command/heading', UInt16, queue_size=10)
 
         rospy.Subscriber('/BlueRov2/imu/attitude', Attitude, self._callback_att)
-        rospy.Subscriber('/Settings/set_heading', Set_heading, self._callback_set_heading)
-        rospy.Subscriber('/Settings/set_target', Set_target, self._callback_set_target)
+        rospy.Subscriber('/BlueRov2/Setting/set_heading', SetHeading, self._callback_set_heading)
+
 
         self.rate = rospy.Rate(rosrate)
         self.attitude = [0, 0, 0, 0, 0, 0] #[ROLL, PITCH, YAW, ROLLSPEED, PITCHSPEED, YAWSPEED]
@@ -99,17 +98,18 @@ class Heading_Controller():
             self.pwm_max = msg.pwm_max
         self.KP = msg.KP 
         self.KD = msg.KD 
-
-    def _callback_set_target(self, msg):
-        """Read data from '/Settings/set_target'
-
-        ROS message:
-        -------------
-        float64 depth_desired
-        float64 heading_desired
-        float64 velocity_desired
-        """
         self.heading_desired = self.deg2rad(msg.heading_desired)
+
+    # def _callback_set_target(self, msg):
+    #     """Read data from '/Settings/set_target'
+
+    #     ROS message:
+    #     -------------
+    #     float64 depth_desired
+    #     float64 heading_desired
+    #     float64 velocity_desired
+    #     """
+    #     self.heading_desired = self.deg2rad(msg.heading_desired)
 
     def deg2rad(self,deg):
         """Convert [0-360]deg to [-pi,pi]rad => [180,360]deg ~ [-pi,0]rad  ,  [0,180]deg ~ [0,pi]rad
@@ -160,6 +160,7 @@ class Heading_Controller():
         yaw = self.attitude[2]
         yawspeed = self.attitude[5]
         u = self.control(yaw, yawspeed)
+        print("u",u)
         pwm = self.pwm_neutral - u
         pwm = self.saturation(pwm)
         print("HEADING_DESIRED : {}, YAW_MESURED : {}, PWM : {}".format(self.heading_desired, yaw, pwm))
