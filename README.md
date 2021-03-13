@@ -10,7 +10,7 @@ bluerov2 的ros接口和界面
 
 2、GUI显示数据、控制rov运动
 
-![界面](https://github.com/realjc/rov_viewer/blob/main/doc/fig1.png)
+![界面](https://github.com/realjc/rov_viewer/blob/main/doc/gui4.png)
 
 
 
