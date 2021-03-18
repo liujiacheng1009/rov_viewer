@@ -1,0 +1,5 @@
+QCustomPlot2的setbasepen的接口似乎不支持pyside2
+所以还要改回pyqt
+
+关闭窗口会出现段错误
+

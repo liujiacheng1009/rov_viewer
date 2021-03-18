@@ -3,6 +3,8 @@
 实现了mavlink数据的解析
 使用前需要修改对应ip和port, 默认为bluerov2 heavy的设置
 '''
+
+
 from pymavlink import mavutil
 
 class MAVBridge(object):
@@ -17,8 +19,10 @@ class MAVBridge(object):
         '''
         self.conn = mavutil.mavlink_connection(device, baud=baudrate)
         self.conn.wait_heartbeat() 
+        ## 设置监听信号的类型，和速率，1似乎是默认的
         self.conn.mav.request_data_stream_send(self.conn.target_system, self.conn.target_component,
                             mavutil.mavlink.MAV_DATA_STREAM_ALL,4, 1)
+        ## 所有的得到的mavlink msg
         self.data = {}
 
     def get_data(self):
@@ -46,7 +50,7 @@ class MAVBridge(object):
         """
         msgs = []
         while True:
-            msg = self.conn.recv_match()
+            msg = self.conn.recv_match() ## 捕获符合要求的信号
             if msg != None:
                 msgs.append(msg)
             else:
@@ -84,7 +88,7 @@ class MAVBridge(object):
             [str, bool]: 飞行模式, 锁定状态
         """
         flight_mode = ""
-
+        ## 一些标准模式
         mode_list = [
             [mavutil.mavlink.MAV_MODE_FLAG_MANUAL_INPUT_ENABLED, 'MANUAL'],
             [mavutil.mavlink.MAV_MODE_FLAG_STABILIZE_ENABLED, 'STABILIZE'],
@@ -107,14 +111,15 @@ class MAVBridge(object):
         return flight_mode, arm
 
     def set_guided_mode(self):
-        """ 设置引导模式
+        """ 设置引导模式，似乎被弃用了
         """
         #https://github.com/ArduPilot/pymavlink/pull/128
         params = [mavutil.mavlink.MAV_MODE_GUIDED, 0, 0, 0, 0, 0, 0]
         self.send_command_long(mavutil.mavlink.MAV_CMD_DO_SET_MODE, params)
     
     def send_command_long(self, command, params=[0, 0, 0, 0, 0, 0, 0], confirmation=0):
-        """ 发送长指令
+        """ 发送长指令 
+            通过一条长命令发送控制指令
 
         参数:
             command (mavlink command): Command

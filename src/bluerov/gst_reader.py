@@ -13,7 +13,7 @@ from gi.repository import Gst
 
 class GSTReader():
     '''
-    输入：监听ip,端口(默认 5600)
+    输入：监听端口(默认 5600)
     输出：image
     '''
     def __init__(self,port=5600):
