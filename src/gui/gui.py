@@ -27,7 +27,7 @@ from imu_page.main import IMUPage
 from image_page import ImagePage
 from manual_control_page import ManualCtrPage
 from pid_ctr_page import PIDCtrPage
-
+from conn import ConnWidget
 
 class GUI(QWidget):
     def __init__(self,parent=None):
@@ -36,6 +36,7 @@ class GUI(QWidget):
         self.resize(960,640)
         self.rov_info = ROVInfo()
         self.begin_page = BeginPage()
+        self.conn_widget = ConnWidget()
         self.imu_page = IMUPage()
         self.image_page = ImagePage()
         self.manual_ctr_page = ManualCtrPage()
@@ -55,10 +56,13 @@ class GUI(QWidget):
         tabWidget.addTab(widget5,"PID控制")
         tabWidget.addTab(widget6,"自主导航")
         layout = QGridLayout()
-        layout.addWidget(self.rov_info.getWidget(),0,0)
-        layout.addWidget(tabWidget,0,1)
+        layout.addWidget(self.rov_info.getWidget(),0,0,8,1)
+        layout.addWidget(self.conn_widget.creatConnGroup(),0,1,1,4)
+        layout.addWidget(tabWidget,1,1,7,4)
         layout.setColumnStretch(0, 1)
         layout.setColumnStretch(1, 8)
+        # layout.setRowStretch(0,1)
+        # layout.setRowStretch(1,3)
         self.setLayout(layout)
 
 

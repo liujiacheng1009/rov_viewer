@@ -8,6 +8,26 @@ from PyQt5.QtGui import *
 
 import gui_rc
 
+
+class PIDWidget:
+    def __init__(self, mode):
+        self.mode = mode
+        self.widget = QGroupBox()
+        self.init_widget()
+
+    def getWidget(self):
+        return self.widget
+
+    def init_widget(self):
+        layout = QGridLayout()
+        label1 = QLabel(self.mode)
+        label2 = QLineEdit()
+        label3 = QLineEdit()
+        
+
+
+
+
 class PIDCtrPage:
     def __init__(self):
         self.groupBox = QGroupBox()

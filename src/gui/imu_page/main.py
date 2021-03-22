@@ -14,23 +14,17 @@ from imu_page.dataplot import DataPlot
 class IMUPage:
     def __init__(self, parent = None):
         self.widget = QtWidgets.QWidget()
-        # self.connGroup = ConnWidget()
         self.visualization = Visualization()
         self.compass = Compass()
         self.dataplot = DataPlot()
         grid = QtWidgets.QGridLayout()
-        #grid.addWidget(self.createFirstExclusiveGroup(), 0, 0)
-        grid.addWidget(self.createConnGroups(),0,0,1,2)
-        #grid.addWidget(self.connGroup.groupBox,2,0,1,2)
-        grid.addWidget(self.createVisualGroups(), 1,0,4,1)
-        grid.addWidget(self.createAccDataGroupbox(),1,1)
-        grid.addWidget(self.createGyrDataGroupbox(),2,1)
-        grid.addWidget(self.createMagDataGroupbox(),3,1)
-        grid.addWidget(self.createAngleGroupbox(),4,1)
-
+        grid.addWidget(self.createVisualGroups(), 0,0,4,1)
+        grid.addWidget(self.createAccDataGroupbox(),0,1)
+        grid.addWidget(self.createGyrDataGroupbox(),1,1)
+        grid.addWidget(self.createMagDataGroupbox(),2,1)
+        grid.addWidget(self.createAngleGroupbox(),3,1)
         self.widget.setLayout(grid)
-        # self.setWindowTitle("Group Box")
-        # self.resize(640, 480)
+
 
     def createVisualGroups(self):
         groupBox = QtWidgets.QGroupBox()
