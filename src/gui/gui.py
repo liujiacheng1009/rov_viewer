@@ -11,7 +11,7 @@ import sys,os,time
 import rospy
 from std_msgs.msg import Bool ,String ,UInt16
 from sensor_msgs.msg import BatteryState,Image, Imu,Joy
-from rov_viewer.msg import Attitude, Bar30, State,SetHeading,SetDepth,SetVelocity ## 自定义msg
+# from rov_viewer.msg import Attitude, Bar30, State,SetHeading,SetDepth,SetVelocity ## 自定义msg
 import signal
 from cv_bridge import CvBridge
 from matplotlib.figure import Figure
