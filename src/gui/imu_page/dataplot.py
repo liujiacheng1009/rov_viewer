@@ -13,17 +13,16 @@ class DataPlot(QWidget):
     建立IMU，acc、gyro、attitude、magnetic的绘图界面
     '''
     def __init__(self,parent = None):
-       # super().__init__(parent)
+        super(DataPlot,self).__init__(parent)
         self.m_accPlot = QCustomPlot()
         self.m_gyrPlot = QCustomPlot()
         self.m_magPlot = QCustomPlot()
         self.m_anglePlot = QCustomPlot()
-
-        self.m_timer = QTimer()
-        self.m_timer.setInterval(20)
         self.m_tickCounter = 0.0
-
+        ## 定时刷新
+        self.m_timer = QTimer()
         self.m_timer.timeout.connect(self.timerCounter)
+        self.m_timer.start(10)
 
         self.m_acc_x_Values = []
         self.m_acc_y_Values = []
@@ -268,17 +267,17 @@ class DataPlot(QWidget):
         self.m_acc_x_Values.append(accData[0])
         self.m_acc_y_Values.append(accData[1])
         self.m_acc_z_Values.append(accData[2])
-        self.m_accPlot.graph(0).setData(m_timestamps,self.m_acc_x_Values)
-        self.m_accPlot.graph(1).setData(m_timestamps,self.m_acc_y_Values)
-        self.m_accPlot.graph(2).setData(m_timestamps,self.m_acc_z_Values)
+        self.m_accPlot.graph(0).setData(self.m_timestamps,self.m_acc_x_Values)
+        self.m_accPlot.graph(1).setData(self.m_timestamps,self.m_acc_y_Values)
+        self.m_accPlot.graph(2).setData(self.m_timestamps,self.m_acc_z_Values)
 
         #gyr
         self.m_gyr_x_Values.append(gyrData[0])
         self.m_gyr_y_Values.append(gyrData[1])
         self.m_gyr_z_Values.append(gyrData[2])
-        self.m_gyrPlot.graph(0).setData(m_timestamps,self.m_gyr_x_Values)
-        self.m_gyrPlot.graph(1).setData(m_timestamps,self.m_gyr_y_Values)
-        self.m_gyrPlot.graph(2).setData(m_timestamps,self.m_gyr_z_Values)
+        self.m_gyrPlot.graph(0).setData(self.m_timestamps,self.m_gyr_x_Values)
+        self.m_gyrPlot.graph(1).setData(self.m_timestamps,self.m_gyr_y_Values)
+        self.m_gyrPlot.graph(2).setData(self.m_timestamps,self.m_gyr_z_Values)
 
         # mag
         self.m_mag_x_Values.append(magData[0])
@@ -289,51 +288,52 @@ class DataPlot(QWidget):
         self.m_magPlot.graph(2).setData(self.m_timestamps,self.m_mag_z_Values)
 
         # change vector leght
-        if(self.m_timestamps.count() > self.dataLength):
+        if(len(self.m_timestamps) > self.dataLength):
             del(self.m_timestamps[0])
         
-        if(self.m_acc_x_Values.count() > self.dataLength):
+        if(len(self.m_acc_x_Values) > self.dataLength):
             del(self.m_acc_x_Values[0])
         
-        if(self.m_acc_y_Values.count() > self.dataLength):
+        if(len(self.m_acc_y_Values) > self.dataLength):
             del(self.m_acc_y_Values[0])
         
-        if(self.m_acc_z_Values.count() > self.dataLength):
+        if(len(self.m_acc_z_Values) > self.dataLength):
             del(self.m_acc_z_Values[0])
         
-        if(self.m_gyr_x_Values.count() > self.dataLength):
+        if(len(self.m_gyr_x_Values) > self.dataLength):
             del(self.m_gyr_x_Values[0])
         
-        if(self.m_gyr_y_Values.count() > self.dataLength):
+        if(len(self.m_gyr_y_Values) > self.dataLength):
             del(self.m_gyr_y_Values[0])
         
-        if(self.m_gyr_z_Values.count() > self.dataLength):
+        if(len(self.m_gyr_z_Values) > self.dataLength):
             del(self.m_gyr_z_Values[0])
         
-        if(self.m_mag_x_Values.count() > self.dataLength):
+        if(len(self.m_mag_x_Values) > self.dataLength):
             del(self.m_mag_x_Values[0])
         
-        if(self.m_mag_y_Values.count() > self.dataLength):
+        if(len(self.m_mag_y_Values) > self.dataLength):
             del(self.m_mag_y_Values[0])
         
-        if(self.m_mag_z_Values.count() > self.dataLength):
+        if(len(self.m_mag_z_Values) > self.dataLength):
             del(self.m_mag_z_Values[0])
         
+
     def updateAngleData(self, angleData):
         # angle
-        self.m_angle_x_Values.append(angleData.x())
-        self.m_angle_y_Values.append(angleData.y())
-        self.m_angle_z_Values.append(angleData.z())
+        self.m_angle_x_Values.append(angleData[0])
+        self.m_angle_y_Values.append(angleData[1])
+        self.m_angle_z_Values.append(angleData[2])
         self.m_anglePlot.graph(0).setData(self.m_timestamps,self.m_angle_x_Values)
         self.m_anglePlot.graph(1).setData(self.m_timestamps,self.m_angle_y_Values)
         self.m_anglePlot.graph(2).setData(self.m_timestamps,self.m_angle_z_Values)
 
         if(self.m_angle_x_Values.count() > self.dataLength):
-            self.m_angle_x_Values.remove(0)
+            del self.m_angle_x_Values[0]
         
         if(self.m_angle_y_Values.count() > self.dataLength):
-            self.m_angle_y_Values.remove(0)
-        
+            del self.m_angle_y_Values[0]
+
         if(self.m_angle_z_Values.count() > self.dataLength):
-            self.m_angle_z_Values.remove(0)
+            del self.m_angle_z_Values[0]
         

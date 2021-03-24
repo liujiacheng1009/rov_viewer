@@ -7,11 +7,11 @@ import sys,signal
 from sensor_msgs.msg import Image
 import cv2
 import numpy as np 
-from yolo import YOLO
+from image_page.yolo.yolo import YOLO
 
-class YOLODetection(QWidget):
+class YOLOWd(QWidget):
     def __init__(self,parent=None):
-        super(YOLODetection, self).__init__(parent)
+        super(YOLOWd, self).__init__(parent)
         self.bridge = CvBridge()
         self.image = None
         self.yolo = YOLO()

@@ -23,8 +23,8 @@ from OpenGL.GLUT import *
 
 from rov_info import ROVInfo
 from begin_page import BeginPage
-from imu_page.main import IMUPage
-from image_page import ImagePage
+from imu_page.imu_page import IMUPage
+from image_page.image_page import ImagePage
 from manual_control_page import ManualCtrPage
 from pid_ctr_page import PIDCtrPage
 from conn import ConnWidget
@@ -65,8 +65,30 @@ class GUI(QWidget):
         # layout.setRowStretch(1,3)
         self.setLayout(layout)
 
+        ## 从ros topic 获取数据
+        rospy.Subscriber('/BlueRov2/imu/data',Imu,self.imu_callback)
+        rospy.Subscriber('/cam0/image_raw', Image, self.camera_callback)
+        
+        ## 获取的数据类型
+        self.imu = None
+        self.image = None
+        self.bridge = CvBridge()
+
+    def imu_callback(self,msg):
+        acc = [msg.linear_acceleration.x, msg.linear_acceleration.y, msg.linear_acceleration.z]
+        gyr = [msg.angular_velocity.x,msg.angular_velocity.y,msg.angular_velocity.z]
+        self.imu_page.dataplot.updateSensorData(acc,gyr,[1,1,1])
+    
+    def camera_callback(self,msg):
+        id = self.image_page.tab_wd.currentIndex()
+        self.image = self.bridge.imgmsg_to_cv2(msg,"bgr8")
+        if(id==0):
+            qimg = QImage(self.image.data, self.image.shape[1], self.image.shape[0], QImage.Format_RGB888)
+            self.image_page.image_label.setPixmap(QPixmap.fromImage(qimg))
+
 
 if __name__ == "__main__":
+    rospy.init_node("gui")
     glutInit(sys.argv)
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     app = QtWidgets.QApplication(sys.argv)

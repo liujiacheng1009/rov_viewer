@@ -2,9 +2,10 @@
 import cv2 
 import numpy as np 
 
-modelConfiguration = 'yolov3-tiny.cfg'
-modelWeights = 'yolov3-tiny.weights'
-classesFile = 'coco.names'
+path = "/home/bluerov/Downloads/catkin_ws/src/rov_viewer/src/gui/image_page/yolo/model/"
+modelConfiguration = path+ 'yolov3-tiny.cfg'
+modelWeights = path+ 'yolov3-tiny.weights'
+classesFile = path + 'coco.names'
 
 class YOLO:
     def __init__(self):
