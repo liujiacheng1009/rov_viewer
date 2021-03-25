@@ -16,9 +16,11 @@ from imu_page.compass import Compass
 from imu_page.dataplot import DataPlot
 import rospy
 from sensor_msgs.msg import Imu
+import random
 
 class IMUPage:
-    def __init__(self, parent = None):
+    def __init__(self):
+        
         self.widget = QtWidgets.QWidget()
         self.visualization = Visualization()
         self.compass = Compass()
@@ -53,6 +55,7 @@ class IMUPage:
         self.label_gyr_x.setText(str(gyr[0]))
         self.label_gyr_y.setText(str(gyr[1]))
         self.label_gyr_z.setText(str(gyr[2]))
+        self.visualization.updateAngles(random.randint(0,99),random.randint(0,120),random.randint(0,180))
         self.dataplot.updateSensorData(acc,gyr,[0,0,0])
 
     def createVisualGroups(self):

@@ -3,11 +3,11 @@ from PyQt5 import QtCore
 from PyQt5 import QtWidgets 
 from PyQt5 import QtGui 
 from OpenGL import GL,GLU,GLUT
+from PyQt5.QtOpenGL import *
 
 class Visualization(QtWidgets.QOpenGLWidget):
-    
     def __init__(self,parent=None):
-        super().__init__(parent)
+        super(Visualization,self).__init__(parent)
         self.xRot = 0
         self.yRot = 0
         self.zRot = 0
@@ -190,7 +190,7 @@ class Visualization(QtWidgets.QOpenGLWidget):
         GL.glPopMatrix()
 
     def updateAngles(self,r,p,y):
-        xRot = int(p)
-        yRot = int(r)
-        zRot = -int(y)
-        GL.updateGL()
+        self.xRot = int(p)
+        self.yRot = int(r)
+        self.zRot = -int(y)
+        self.update()
