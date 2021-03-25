@@ -83,5 +83,5 @@ class Compass(QtWidgets.QWidget):
         painter.drawEllipse(QtCore.QPoint(0,0),50,50)
         
     def updateAngle(self,angle):
-        m_angle = angle
-        update()
+        self.m_angle = angle
+        self.update()
