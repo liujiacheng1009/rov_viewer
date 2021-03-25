@@ -37,3 +37,16 @@ bluerov2 的ros接口和界面
 现在能做的，获取imu、camera数据， 
 
 - depth_controller.py 
+
+1、设备类型：bluerov heavy 
+该ROV为BlueRobotics公司开发的开源产品，具有八个推进器，能够
+实现六个自由度的运动控制。
+
+2、软件介绍
+本软件是针对BlueROV平台开发的一款交互界面，初步实现了
+IMU、相机信息的采集、显示、保存，相机标定，视觉检测，
+手动、自动控制等功能。
+
+3、操作须知
+本软件基于PyQt5开发，但需要ROS的支持，目前只支持
+linux平台。
