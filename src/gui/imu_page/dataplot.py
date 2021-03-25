@@ -22,7 +22,7 @@ class DataPlot(QWidget):
         ## 定时刷新
         self.m_timer = QTimer()
         self.m_timer.timeout.connect(self.timerCounter)
-        self.m_timer.start(10)
+        self.m_timer.start(20)
 
         self.m_acc_x_Values = []
         self.m_acc_y_Values = []
@@ -37,10 +37,10 @@ class DataPlot(QWidget):
         self.m_angle_y_Values = []
         self.m_angle_z_Values = []
         self.m_timestamps = []
-        self.dataLength = 500
+        self.dataLength = 800
 
     def createAccPlot(self):
-        self.m_accPlot.yAxis.setRange(-256,256)
+        self.m_accPlot.yAxis.setRange(-25,25)
         self.m_accPlot.xAxis.setTickLength(1)
 
         self.m_accPlot.xAxis.setBasePen(QPen(Qt.white, 1))
@@ -92,7 +92,7 @@ class DataPlot(QWidget):
 
 
     def createGyrPlot(self):
-        self.m_gyrPlot.yAxis.setRange(-2000,2000)
+        self.m_gyrPlot.yAxis.setRange(-4,4)
         self.m_gyrPlot.xAxis.setTickLength(2)
         self.m_gyrPlot.xAxis.setBasePen(QPen(Qt.white, 1))
         self.m_gyrPlot.yAxis.setBasePen(QPen(Qt.white, 1))
@@ -247,7 +247,7 @@ class DataPlot(QWidget):
         return self.m_anglePlot
 
     def timerCounter(self):
-        self.m_tickCounter += 0.025
+        self.m_tickCounter += 0.05
         self.m_accPlot.xAxis.setRange(self.m_tickCounter-10,self.m_tickCounter +2)
         self.m_gyrPlot.xAxis.setRange(self.m_tickCounter-10,self.m_tickCounter +2)
         self.m_magPlot.xAxis.setRange(self.m_tickCounter-10,self.m_tickCounter +2)

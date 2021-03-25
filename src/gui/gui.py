@@ -2,7 +2,6 @@
 '''
 主界面
 '''
-
 from PyQt5 import QtGui, QtCore, QtWidgets, uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -19,15 +18,14 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import OpenGL
 from OpenGL.GL import *
 from OpenGL.GLUT import *
+from multiprocessing import Process
 
-
-from rov_info import ROVInfo
-from begin_page import BeginPage
+from begin_page import BeginPage,ConnWidget,ROVInfo
 from imu_page.imu_page import IMUPage
 from image_page.image_page import ImagePage
-from manual_control_page import ManualCtrPage
+from gamepad_page.gamepad_page import ManualCtrPage
 from pid_ctr_page import PIDCtrPage
-from conn import ConnWidget
+
 
 class GUI(QWidget):
     def __init__(self,parent=None):
@@ -35,30 +33,30 @@ class GUI(QWidget):
         self.setWindowTitle("ROV VIEWER")
         self.resize(960,640)
         self.rov_info = ROVInfo()
-        self.begin_page = BeginPage()
-        self.conn_widget = ConnWidget()
+        self.begin_page = BeginPage(self)
+        self.conn_widget = ConnWidget(self)
         self.imu_page = IMUPage()
         self.image_page = ImagePage()
         self.manual_ctr_page = ManualCtrPage()
         self.pid_ctr_page = PIDCtrPage()
-        tabWidget = QTabWidget()
+        self.bluerov = None
+        self.tabWidget = QTabWidget()
         widget1 = self.begin_page.getWidget()
         widget2 = self.imu_page.getWidget()
         widget3 = self.image_page.getWidget()
         widget4 = self.manual_ctr_page.getWidget()
         widget5 = self.pid_ctr_page.getWidget()
         widget6 = QWidget()
-
-        tabWidget.addTab(widget1,QIcon(":/icon/icon/home.png"),"")
-        tabWidget.addTab(widget2,"IMU")
-        tabWidget.addTab(widget3,"相机")
-        tabWidget.addTab(widget4,"手动控制")
-        tabWidget.addTab(widget5,"PID控制")
-        tabWidget.addTab(widget6,"自主导航")
+        self.tabWidget.addTab(widget1,QIcon(":/icon/icon/home.png"),"")
+        self.tabWidget.addTab(widget2,"IMU")
+        self.tabWidget.addTab(widget3,"相机")
+        self.tabWidget.addTab(widget4,"手动控制")
+        self.tabWidget.addTab(widget5,"PID控制")
+        self.tabWidget.addTab(widget6,"自主导航")
         layout = QGridLayout()
         layout.addWidget(self.rov_info.getWidget(),0,0,8,1)
         layout.addWidget(self.conn_widget.creatConnGroup(),0,1,1,4)
-        layout.addWidget(tabWidget,1,1,7,4)
+        layout.addWidget(self.tabWidget,1,1,7,4)
         layout.setColumnStretch(0, 1)
         layout.setColumnStretch(1, 8)
         # layout.setRowStretch(0,1)
@@ -66,13 +64,26 @@ class GUI(QWidget):
         self.setLayout(layout)
 
         ## 从ros topic 获取数据
-        rospy.Subscriber('/BlueRov2/imu/data',Imu,self.imu_callback)
+        #rospy.Subscriber('/BlueRov2/imu/data',Imu,self.imu_callback)
         rospy.Subscriber('/cam0/image_raw', Image, self.camera_callback)
         
         ## 获取的数据类型
         self.imu = None
         self.image = None
         self.bridge = CvBridge()
+        # self.rov_proc = Process(target=self.bluerovProcess,args=())
+        # self.rov_proc.start()
+
+    def bluerovProcess(self):
+         while not rospy.is_shutdown():
+            if(self.bluerov is not None):
+                try:
+                    self.bluerov.publish()
+                    print("hh")
+                except:
+                    pass
+                
+
 
     def imu_callback(self,msg):
         acc = [msg.linear_acceleration.x, msg.linear_acceleration.y, msg.linear_acceleration.z]
@@ -85,7 +96,10 @@ class GUI(QWidget):
         if(id==0):
             qimg = QImage(self.image.data, self.image.shape[1], self.image.shape[0], QImage.Format_RGB888)
             self.image_page.image_label.setPixmap(QPixmap.fromImage(qimg))
+        elif(id==2):
+            self.image_page.yolo_wd.callback(self.image)
 
+    
 
 if __name__ == "__main__":
     rospy.init_node("gui")

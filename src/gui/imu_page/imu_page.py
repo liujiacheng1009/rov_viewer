@@ -7,9 +7,15 @@ import OpenGL
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+
 from imu_page.visualization import Visualization
 from imu_page.compass import Compass
 from imu_page.dataplot import DataPlot
+import rospy
+from sensor_msgs.msg import Imu
 
 class IMUPage:
     def __init__(self, parent = None):
@@ -18,13 +24,36 @@ class IMUPage:
         self.compass = Compass()
         self.dataplot = DataPlot()
         grid = QtWidgets.QGridLayout()
+        self.label_acc_x = QLabel()
+        self.label_acc_y = QLabel()
+        self.label_acc_z = QLabel()
+        self.label_gyr_x = QLabel()
+        self.label_gyr_y = QLabel()
+        self.label_gyr_z = QLabel()
+        self.label_mag_x = QLabel()
+        self.label_mag_y = QLabel()
+        self.label_mag_z = QLabel()
+        self.label_ang_x = QLabel()
+        self.label_ang_y = QLabel()
+        self.label_ang_z = QLabel()
         grid.addWidget(self.createVisualGroups(), 0,0,4,1)
         grid.addWidget(self.createAccDataGroupbox(),0,1)
         grid.addWidget(self.createGyrDataGroupbox(),1,1)
         grid.addWidget(self.createMagDataGroupbox(),2,1)
         grid.addWidget(self.createAngleGroupbox(),3,1)
         self.widget.setLayout(grid)
+        rospy.Subscriber('/imu0',Imu,self.imu_callback)
 
+    def imu_callback(self,msg):
+        acc = [msg.linear_acceleration.x, msg.linear_acceleration.y, msg.linear_acceleration.z]
+        gyr = [msg.angular_velocity.x,msg.angular_velocity.y,msg.angular_velocity.z]
+        self.label_acc_x.setText(str(acc[0]))
+        self.label_acc_y.setText(str(acc[1]))
+        self.label_acc_z.setText(str(acc[2]))
+        self.label_gyr_x.setText(str(gyr[0]))
+        self.label_gyr_y.setText(str(gyr[1]))
+        self.label_gyr_z.setText(str(gyr[2]))
+        self.dataplot.updateSensorData(acc,gyr,[0,0,0])
 
     def createVisualGroups(self):
         groupBox = QtWidgets.QGroupBox()
@@ -53,19 +82,14 @@ class IMUPage:
         groupBox = QtWidgets.QGroupBox()
         layout = QtWidgets.QVBoxLayout()
         groupBox.setLayout(layout)
-
-        lableX = QtWidgets.QLabel()
-        lableX.setText("0")
-        lableY = QtWidgets.QLabel()
-        lableY.setText("0")
-        lableZ = QtWidgets.QLabel()
-        lableZ.setText("0")
-
-        layout.addWidget(lableX)
-        layout.addWidget(lableY)
-        layout.addWidget(lableZ)
-
+        self.label_acc_x.setText("0")
+        self.label_acc_y.setText("0")
+        self.label_acc_z.setText("0")
+        layout.addWidget(self.label_acc_x)
+        layout.addWidget(self.label_acc_y)
+        layout.addWidget( self.label_acc_z)
         groupBox.setFixedWidth(150)
+        groupBox.setTitle('线加速度')
         return groupBox    
 
     def createGyrDataGroupbox(self):
@@ -73,18 +97,15 @@ class IMUPage:
         layout = QtWidgets.QVBoxLayout()
         groupBox.setLayout(layout)
 
-        lableX = QtWidgets.QLabel()
-        lableX.setText("0")
-        lableY = QtWidgets.QLabel()
-        lableY.setText("0")
-        lableZ = QtWidgets.QLabel()
-        lableZ.setText("0")
-
-        layout.addWidget(lableX)
-        layout.addWidget(lableY)
-        layout.addWidget(lableZ)
+        self.label_gyr_x.setText("0")
+        self.label_gyr_y.setText("0")
+        self.label_gyr_z.setText("0")
+        layout.addWidget(self.label_gyr_x)
+        layout.addWidget(self.label_gyr_y)
+        layout.addWidget( self.label_gyr_z)
 
         groupBox.setFixedWidth(150)
+        groupBox.setTitle('角速度')
         return groupBox    
 
     def createMagDataGroupbox(self):
@@ -92,18 +113,15 @@ class IMUPage:
         layout = QtWidgets.QVBoxLayout()
         groupBox.setLayout(layout)
 
-        lableX = QtWidgets.QLabel()
-        lableX.setText("0")
-        lableY = QtWidgets.QLabel()
-        lableY.setText("0")
-        lableZ = QtWidgets.QLabel()
-        lableZ.setText("0")
-
-        layout.addWidget(lableX)
-        layout.addWidget(lableY)
-        layout.addWidget(lableZ)
+        self.label_mag_x.setText("0")
+        self.label_mag_y.setText("0")
+        self.label_mag_z.setText("0")
+        layout.addWidget(self.label_mag_x)
+        layout.addWidget(self.label_mag_y)
+        layout.addWidget( self.label_mag_z)
 
         groupBox.setFixedWidth(150)
+        groupBox.setTitle('磁力计')
         return groupBox    
 
     def createAngleGroupbox(self):
@@ -111,19 +129,16 @@ class IMUPage:
         layout = QtWidgets.QVBoxLayout()
         groupBox.setLayout(layout)
 
-        lableX = QtWidgets.QLabel()
-        lableX.setText("0")
-        lableY = QtWidgets.QLabel()
-        lableY.setText("0")
-        lableZ = QtWidgets.QLabel()
-        lableZ.setText("0")
-
-        layout.addWidget(lableX)
-        layout.addWidget(lableY)
-        layout.addWidget(lableZ)
+        self.label_ang_x.setText("0")
+        self.label_ang_y.setText("0")
+        self.label_ang_z.setText("0")
+        layout.addWidget(self.label_ang_x)
+        layout.addWidget(self.label_ang_y)
+        layout.addWidget( self.label_ang_z)
 
         groupBox.setFixedWidth(150)
-        return groupBox    
+        groupBox.setTitle('姿态角')
+        return groupBox 
 
 
     def createFirstExclusiveGroup(self):

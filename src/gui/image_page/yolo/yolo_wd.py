@@ -25,18 +25,18 @@ class YOLOWd(QWidget):
         self.setLayout(layout)
 
     def callback(self,msg):
-        self.image = self.bridge.imgmsg_to_cv2(msg,"bgr8")
+        self.image = msg
         self.yolo.detect(self.image)
         image = QImage(self.image.data, self.image.shape[1], self.image.shape[0], QImage.Format_RGB888)
         self.label.setPixmap(QPixmap.fromImage(image))
 
  
 
-if __name__ == "__main__":
-    signal.signal(signal.SIGINT, signal.SIG_DFL)
-    rospy.init_node("yolo4_node")
-    app = QApplication(sys.argv)
-    w = YOLODetection()
-    w.show()
-    rospy.Subscriber('/cam0/image_raw', Image, w.callback)
-    app.exec_()
+# if __name__ == "__main__":
+#     signal.signal(signal.SIGINT, signal.SIG_DFL)
+#     rospy.init_node("yolo4_node")
+#     app = QApplication(sys.argv)
+#     w = YOLODetection()
+#     w.show()
+#     rospy.Subscriber('/cam0/image_raw', Image, w.callback)
+#     app.exec_()

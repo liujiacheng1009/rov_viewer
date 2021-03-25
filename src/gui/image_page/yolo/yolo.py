@@ -14,7 +14,7 @@ class YOLO:
         self.whT = 320
         self.classNames = []
         with open(classesFile, 'rt') as f:
-            classNames = f.read().rstrip('\n').split('\n')
+            self.classNames = f.read().rstrip('\n').split('\n')
         self.net = cv2.dnn.readNetFromDarknet(modelConfiguration, modelWeights)
         self.net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
         self.net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
@@ -49,7 +49,7 @@ class YOLO:
                     bbox.append([x,y,w,h])
                     classIds.append(classId)
                     confs.append(float(confidence))
-        print(len(bbox))
+
         indices = cv2.dnn.NMSBoxes(bbox,confs,self.confThreshold,self.nms_threshold)
         for i in indices:
             #to remove the extra bracket
@@ -60,6 +60,6 @@ class YOLO:
             #drawing the box
             cv2.rectangle(image,(x,y),(x+w,y+h),(255,0,255),2)
             #print name and confidence level
-            cv2.putText(image,f'{classNames[classIds[i]].upper()} {int(confs[i]*100)}%',
+            cv2.putText(image,f'{self.classNames[classIds[i]].upper()} {int(confs[i]*100)}%',
                         (x,y-10),cv2.FONT_HERSHEY_SIMPLEX,0.6,(255,0,255),2)
         

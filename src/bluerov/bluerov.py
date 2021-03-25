@@ -16,7 +16,6 @@ from gst_reader import GSTReader
 from cv_bridge import CvBridge
 
 # msgs type
-from geometry_msgs.msg import TwistStamped
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import BatteryState, Image, Imu,Joy
 from std_msgs.msg import Bool, String ,UInt16
@@ -77,7 +76,7 @@ class BlueRov(MAVBridge):
                 1
             ]
         }
-        ## 手动控制，将gamepad的控制信号传输给ROV
+        ## 手动控制，将gamepad的控制信号传输给ROV,这里其实只能控制灯光
         ## arm 用于解锁
         ## rc_channel可以用于模拟控制(轴向运动，而非控制电机)，不建议使用
         self.sub_topics= {
@@ -500,6 +499,7 @@ if __name__ == '__main__':
     except rospy.ROSInterruptException as error:
         print('pubs error with ROS: ', error)
         exit(1)
+
 
     bluerov = BlueRov(device='udp:192.168.2.1:14560')
 

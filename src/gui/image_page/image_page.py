@@ -18,12 +18,12 @@ class ImagePage:
 
     def createWidget(self):
         self.tab_wd = QTabWidget()
-        self.widget1 = QWidget()
+        self.widget1 = self.createImgWidget()
         self.widget2 = CalibWd()
-        self.widget3 = YOLOWd()
+        self.yolo_wd = YOLOWd()
         self.tab_wd.addTab(self.widget1,"查看")
         self.tab_wd.addTab(self.widget2,"相机标定")
-        self.tab_wd.addTab(self.widget3,"目标检测")
+        self.tab_wd.addTab(self.yolo_wd,"目标检测")
         layout = QGridLayout()
         layout.addWidget(self.tab_wd)
         self.groupBox.setLayout(layout)
