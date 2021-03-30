@@ -26,8 +26,8 @@ bluerov2 的ros接口和界面
   
 
 规划：
-- mavlink.py px4信号的收发工作,应当是单例
-- gstreamer.py camera信号的解析，单例
+- mavlink.py px4信号的收发工作,
+- gstreamer.py camera信号的解析，
 
 - gamepad.py gamepad的替代,通过按键获取控制信号，通过mavlink.py发送回px4 // 不是优先实现
 - pid.py PID算法的实现,从界面获取kp、ki、kd和目标状态，输出pwm信号，通过mavlink.py发送回px4// 优先实现
