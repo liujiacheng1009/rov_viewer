@@ -50,3 +50,5 @@ IMU、相机信息的采集、显示、保存，相机标定，视觉检测，
 3、操作须知
 本软件基于PyQt5开发，但需要ROS的支持，目前只支持
 linux平台。
+
+![ppt](https://github.com/realjc/rov_viewer/blob/main/doc/rov_viewer.jpg)
